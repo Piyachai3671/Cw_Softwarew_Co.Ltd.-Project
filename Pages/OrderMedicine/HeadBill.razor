@@ -1,0 +1,95 @@
+﻿@page "/HeadBill"
+@using CW_ordermedicine.Data.Models;
+@using CW_ordermedicine.Data.Services;
+@inject UserService userService
+@inject LoginService loginService
+
+@if (ListUser == null)
+{
+    <p>
+        Loading...
+    </p>
+}
+@*@foreach (var User in ListUser.FindAll(e => e.UserID == UserLogin.UserID))
+{*@
+   
+    <div class="card mb-2" style="">
+        <div class="card-header" style="">รายละเอียดผู้ทำรายการ</div>
+
+        <div class="card-body" style="background-color:pink;">
+
+            <div class="row" style="">
+                <div class="row mt-2">
+                    <div class="col d-inline-flex">
+                    <strong>ชื่อผู้ใช้งาน : @UserLogin.Name</strong>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <label>แผนก :  </label>
+                            </div>
+                            <div class="col">
+                            @UserLogin.Department
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col mb-2">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <label>กลุ่ม :</label>
+                            </div>
+                            <div class="col">
+                            @UserLogin.GroupID
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col mb-2">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <label>เบอร์โทร :</label>
+                            </div>
+                            <div class="col">
+                                @UserLogin.Tel
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+@*}*@
+
+
+@code{
+    private List<User> ListUser = new List<User>();
+    private User? UserLogin = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+
+        
+        //var Users = await userService.GetUserAsync();
+        //foreach (var user in Users)
+        //{
+            
+        //    ListUser.Add(new User().ToUi(user));
+        //    //listuser.add(new user
+        //    //	{
+        //    //		userid = user.userid,
+        //    //		username = user.name,
+        //    //		name = user.name,
+        //    //		department = user.department,
+        //    //		password = user.password,
+        //    //		groupid = user.groupid
+        //    //	});
+
+        //}
+    }
+   
+}

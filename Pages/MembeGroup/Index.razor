@@ -1,0 +1,137 @@
+﻿@page "/member-group"
+@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject GroupMemberService groupMemberService
+@inject UserService userService
+@inject NavigationManager NavigationManager
+
+<div class="container border-card">
+	<div class="row">
+		<div class="card-header" style=" color:#ffffff; background: linear-gradient( 90deg,#8BD2EC,#92CEA8, #FCEE9E,#FFF3D7);">
+			<div class="d-flex bd-highlight">
+				<div class="p-2 flex-grow-1 bd-highlight">
+					<h3>Member Group</h3>
+				</div>
+				<div class="p-2 bd-highlight">
+					<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#FromAddGroup"><i class="fa-solid fa-plus me-2"></i>Create Group</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="card-body bg2" style="background-color:rgba(204,255,255,0.6);">
+
+			<div class="row">
+				@if (ListGroupMember == null)
+				{ }
+				else
+				{
+					@foreach (var Group in ListGroupMember)
+					{
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6  mb-3">
+							<div class="container shadow" style=" border-radius:10px; background-color:white; height:300px; width:330px;">
+								<div style="color:black;">
+									<strong class="" style="font-size:24px;"> ชื่อกลุ่ม : @Group.GroupName</strong>
+									<div class="mt-2" style="font-size:18px;">แผนก @Group.Department</div>
+									
+
+									<button class="btn btn-link" @onclick="()=>OpenGroupInMemberPage(Group.GroupID)">
+										
+										<p>ดูสมาชิกทั้งหมด</p>
+									</button>
+
+
+								</div>
+
+								<div style="font-size:20px;position:relative; left:270px; top:-100px;">
+									<i class="fa-solid fa-trash bincolor" @onclick="()=>OnDeleteGroup(Group)"></i>
+								</div>
+
+								<div class="row" style="margin-top:80px; margin-left:220px;">
+									<div class="">
+											<button class="btn btn-success me-1" style="border-radius:10px; font-size:25px;" data-bs-toggle="modal" data-bs-target="#FromAddMember" @onclick="()=>OpenGroupInMemberPage(Group.GroupID)">
+												<i class="fa-solid fa-user-plus" style="font-size:19px;"></i>
+											</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					}
+
+				}
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+
+
+<FromAddGroup GetAddGroupID="OnAddGroup"></FromAddGroup>
+
+
+@code {
+	private List<GroupMember> ListGroupMember = new List<GroupMember>();
+	private List<User> ListUser = new List<User>();
+	private User? ResetGroupID;
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		//ListGroupMember = await groupMemberService.GetGroupAsync();
+		var Groups = await groupMemberService.GetGroupAsync();
+		foreach (var Group in Groups)
+		{
+			ListGroupMember.Add(new GroupMember().ToUi(Group));
+		}
+
+
+		var Users = await userService.GetUserAsync();
+		foreach (var user in Users)
+		{
+			ListUser.Add(new User().ToUi(user));
+			//ListUser.Add(new User
+			//	{
+			//		UserID = user.UserID,
+			//		Username = user.Name,
+			//		Name = user.Name,
+			//		Department = user.Department,
+			//		Password = user.Password,
+			//		GroupID = user.GroupID
+			//	});
+
+		}
+
+	}
+	private void OnDeleteGroup(GroupMember elegroup)
+	{
+		//@foreach (var ListUsers in ListUser)
+		//{
+		//	@if (ListUsers.GroupID == elegroup.GroupID)
+		//	{
+		//		ListUsers.GroupID = 0;
+		//	}
+
+		//}
+		ListGroupMember.Remove(elegroup); //ลบกลุ่มUI
+		var DeleteGroupMember = new GroupMember().ToTable(elegroup);//ลบกลุ่มในSQL
+		groupMemberService.DeleteGroupMember(DeleteGroupMember);
+
+	}
+	private Task OnAddGroup(GroupMember id)
+	{
+		ListGroupMember.Add(id);
+		return Task.CompletedTask;
+
+	}
+	private void CurrentID(int SentCurrentGroupID)
+	{
+		NavigationManager.NavigateTo($"/list-group/{SentCurrentGroupID}");
+	}
+	private void OpenGroupInMemberPage(int GroupInMemberID)
+	{
+		NavigationManager.NavigateTo($"/list-group/{GroupInMemberID}");
+	}
+
+}

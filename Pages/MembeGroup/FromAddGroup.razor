@@ -1,0 +1,128 @@
+﻿@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject GroupMemberService groupMemberService
+@inject UserService userService
+@inject LoginService loginService
+
+@page "/dropdown"
+<div class="modal fade" id="FromAddGroup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header head_green">
+				<h5 class="modal-title" id="staticBackdropLabel">Create group</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="container">
+					<div class="row">
+						<div class="col-12">
+
+							<EditForm Model="@Group">
+								<DataAnnotationsValidator></DataAnnotationsValidator>
+
+
+
+								<div class="form-group mt-2">
+									<label for="productname">Group name</label>
+									<InputText @bind-Value="Group.GroupName" type="text" class="form-control mt-2" placeholder=" " />
+									<ValidationMessage For="(()=>Group.GroupName)"></ValidationMessage>
+								</div>
+
+								<label class="mt-2">
+									แผนก:
+									<InputSelect @bind-Value="Group.Department">
+										<option value="">เลือกแผนก</option>
+										<option value="Software">Software</option>
+										<option value="Account">Account</option>
+										<option value="Maid">Maid</option>
+									</InputSelect>
+								</label>
+
+							</EditForm>
+							@*<RadzenDropDown TValue="string" style="" Placeholder="Select Department"
+							Data="@(ListGroup.Select(c=> new {GroupID=c.GruopID , Department=c.Department}))"
+							TextProperty="Department" ValueProperty="GroupID">
+							</RadzenDropDown>*@
+
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-success" click="onSave" @onclick="OnClickAddGroup">Create</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+			</div>
+
+
+
+		</div>
+	</div>
+</div>
+
+
+@code {
+	[Parameter]
+	public EventCallback<GroupMember> GetAddGroupID { get; set; }
+
+	public List<GroupMember> ListGroupMember = new List<GroupMember>();
+	public List<User> ListUser = new List<User>();
+	private GroupMember Group = new();
+	private User? UserLogin = new();
+	public User NewUser;  //แปลง
+	public List<GroupMember> Test = new List<GroupMember>();
+	private void AddNewUser(User NewUser) //แปลง
+	{
+		var u = new User().ToTable(NewUser);
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		//Group = new GroupMember();
+		//ListGroupMember = await groupMemberService.GetGroupAsync();
+		var Groups = await groupMemberService.GetGroupAsync();
+		foreach (var Group in Groups)
+		{
+			ListGroupMember.Add(new GroupMember().ToUi(Group));
+		}
+
+		var Users = await userService.GetUserAsync();
+		foreach (var user in Users)
+		{
+			ListUser.Add(new User().ToUi(user));
+			//ListUser.Add(new User
+			//	{
+			//		UserID = user.UserID,
+			//		Username = user.Name,
+			//		Name = user.Name,
+			//		Department = user.Department,
+			//		Password = user.Password,
+			//		GroupID = user.GroupID
+			//	});
+
+		}
+
+		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+
+	}
+	private void OnClickAddGroup()
+	{
+		if (Group == null) return;
+		var AddGroup = new GroupMember().ToTable(Group);
+		groupMemberService.AddNewGroupMember(AddGroup); //บันทึกข้อมูล
+
+		Group.GroupName = "";
+		Group.Department = "";
+
+		GroupMember CreateListGroup = new GroupMember()
+			{
+				GroupID = AddGroup.GroupID,
+				GroupName = AddGroup.GroupName,
+				Department = AddGroup.Department,
+			};
+
+		GetAddGroupID.InvokeAsync(CreateListGroup);
+	
+	}
+
+}

@@ -1,0 +1,93 @@
+﻿@page "/file-upload-2"
+@using System
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject IWebHostEnvironment Environment
+@inject ImgService imgService
+
+<h3>Upload Files</h3>
+
+<p>
+	<label>
+		Max file size:
+		<input type="number" @bind="maxFileSize" />
+	</label>
+</p>
+
+<p>
+	<label>
+		Max allowed files:
+		<input type="number" @bind="maxAllowedFiles" />
+	</label>
+</p>
+
+<p>
+	<label>
+		Upload up to @maxAllowedFiles of up to @maxFileSize bytes:
+		<InputFile OnChange="@LoadFiles" multiple />
+	</label>
+</p>
+
+@if (isLoading)
+{
+	<p>Name: @CurrentImg</p>
+}
+else
+{
+	<ul>
+		@foreach (var file in loadedFiles)
+		{
+			<li>
+				<ul>
+					<li><img src="img/@CurrentImg" width="500" height="600"></li>
+					<li>Name: @CurrentImg</li>
+					<li>Last modified: @file.LastModified.ToString()</li>
+					<li>Size (bytes): @file.Size</li>
+					<li>Content type: @file.ContentType</li>
+				</ul>
+			</li>
+
+		}
+	</ul>
+}
+
+@code {
+	private List<string> CurrentImg1 = new List<string>();
+	private List<IBrowserFile> loadedFiles = new();
+	private long maxFileSize = (1024 * 10) * 1024;
+	private int maxAllowedFiles = 3;
+	private bool isLoading;
+	public string CurrentImg = "";
+	private async Task LoadFiles(InputFileChangeEventArgs e)
+	{
+		isLoading = true;
+		loadedFiles.Clear();
+
+		foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+		{
+			try
+			{
+				loadedFiles.Add(file);
+				Console.WriteLine(Path.GetRandomFileName());
+				var trustedFileNameForFileStorage = Path.GetRandomFileName()+file.Name;
+				CurrentImg = trustedFileNameForFileStorage;	
+				var path = Path.Combine(Environment.ContentRootPath,
+						"wwwroot", "img", trustedFileNameForFileStorage);
+				await using FileStream fs = new(path, FileMode.Create);
+				await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+				Img NewImg = new() { Imgname = trustedFileNameForFileStorage, path = path };
+				var b = new Img().ToTable(NewImg); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+				imgService.AddNewImg(b); //บันทึกข้อมูล
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+			}
+			
+		}
+		isLoading = false;
+	}
+}

@@ -1,0 +1,9 @@
+diff a/wwwroot/css/site.css b/wwwroot/css/site.css	(rejected hunks)
+@@ -230,6 +230,7 @@
+     top: 0%;
+ }
+ .ErrorShowin {
++    width: 500px;
+     height: 220px;
+     border-radius: 5px;
+ }*/

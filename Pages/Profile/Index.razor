@@ -1,0 +1,241 @@
+﻿@using CW_ordermedicine.Data.Models;
+@using CW_ordermedicine.Data.Services;
+@using System
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@inject IWebHostEnvironment Environment
+@inject LoginService loginService
+@inject UserService userService
+@inject ImgService imgService
+
+@page "/Profile"
+<div class="card mb-2" style="">
+	<div class="card-header" style="">รายละเอียดผู้ใช้งาน</div>
+
+	<div class="card-body" style="background-color:pink;">
+
+		<div class="row" style="">
+			<div class="row mt-2">
+				<div class="col d-inline-flex">
+					<strong>ชื่อผู้ใช้งาน : @UserLogin.Name</strong>
+				</div>
+			</div>
+
+			<div class="row mt-2">
+				<div class="col">
+					<div class="row">
+						<div class="col-lg-3">
+							<label>แผนก :  </label>
+						</div>
+						<div class="col">
+							@UserLogin.Department
+						</div>
+					</div>
+				</div>
+				<div class="col mb-2">
+					<div class="row">
+						<div class="col-lg-3">
+							<label>กลุ่ม :</label>
+						</div>
+						<div class="col">
+							@UserLogin.GroupID
+						</div>
+					</div>
+				</div>
+
+				<div class="col mb-2">
+					<div class="row">
+						<div class="col-lg-3">
+							<label>เบอร์โทร :</label>
+						</div>
+						<div class="col">
+							@UserLogin.Tel
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container h-100 ">
+	<div class="row d-flex justify-content-center align-items-center h-100">
+		<div class="col-lg-12 col-xl-11">
+			<div class="card text-black" style="border-radius: 25px;">
+				<div class="card-body p-md-5">
+
+					<EditForm Model="@UserLogin">
+						<div class="row just-center">
+							<div class="col-md-10 col-lg-6 col-xl-5 ify-contentorder-2 order-lg-1">
+								<p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">ประวัติส่วนตัว</p>
+								<form class="mx-1 mx-md-4">
+									<div class="d-flex flex-row align-items-center mb-4">
+										<i class="fas fa-user fa-lg me-3 fa-fw"></i>
+										<div class="form-outline flex-fill mb-0">
+											<input disabled type="email" class="form-control " value="@UserLogin.Name" />
+											<label class="form-label">ชื่อ - นามสกุล</label>
+										</div>
+									</div>
+
+									<div class="d-flex flex-row align-items-center mb-4">
+										<i class="fa-solid fa-phone fa-lg me-3 fa-fw"></i>
+										<div class="form-outline flex-fill mb-0">
+											<InputText @bind-Value="@UserLogin.Tel" type="text" id="form3Example3c" class="form-control" />
+											<label class="form-label" for="form3Example3c">เบอร์โทร</label>
+										</div>
+									</div>
+
+									<div class="d-flex flex-row align-items-center mb-4">
+										<i class="fa-solid fa-id-badge fa-lg me-3 fa-fw"></i>
+										<div class="form-outline flex-fill mb-0">
+											<InputSelect @bind-Value="UserLogin.Department" class="form-control" style="height:40px; width:150px;" id="form3Example3c">
+												<option disabled value="">เลือกแผนก</option>
+												<option value="Software">Software</option>
+												<option value="Account">Account</option>
+												<option value="Maid">Maid</option>
+											</InputSelect>
+											<div>
+												<label class="form-label" for="form3Example3c">แผนก</label>
+											</div>
+										</div>
+									</div>
+
+									<div class="d-flex flex-row align-items-center mb-4">
+										<i class="fa-sharp fa-solid fa-key fa-lg me-3 fa-fw"></i>
+										<div class="form-outline flex-fill mb-0">
+											<InputText @bind-Value="@UserLogin.Password" type="password" id="form3Example3c" class="form-control" />
+											<label class="form-label" for="form3Example3c">รหัสผ่าน</label>
+										</div>
+									</div>
+
+									<div class="form-check d-flex justify-content-center mb-5">
+										<input class="form-check-input me-2" type="checkbox" value="" id="form2Example3c" />
+										<label class="form-check-label" for="form2Example3">
+											I agree all statements in <a href="#!">Terms of service</a>
+										</label>
+									</div>
+
+								</form>
+							</div>
+							<div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2 ">
+								<div class="row">
+									<div class="col">
+										@*<img src="/img/cw1.jpg"
+										class="img-fluid shadow" style="border-radius:10px;">*@
+
+
+										@if (CurrentImg == "")
+										{
+											<img class="mt-3" src="img/@UserLogin.UserImgName" width="400" height="400">
+										}
+										@if (isLoading == true) //ถ้ามีการเพิ่มรูป จะทำการแสดงข้อความ
+										{
+											<p>Loading . . .</p>
+
+										}
+										else //จากนั้นจะเปลี่ยนให้ทำการอัพโหลด
+										{
+											@foreach (var file in loadedFiles)
+											{				
+												<img class="mt-3" src="img/@CurrentImg" width="400" height="400">
+											}
+										}
+									</div>
+									<div class="mt-3">
+										<InputFile OnChange="LoadFiles" multiple></InputFile>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</EditForm>
+					<div class="mt-5 d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+						<button class="btn btn-primary btn-lg" @onclick="OnClickEditUser">บันทึก</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+@code {
+	private List<string> CurrentImg1 = new List<string>();
+	private List<IBrowserFile> loadedFiles = new();
+	private long maxFileSize = (1024 * 10) * 1024;
+	private int maxAllowedFiles = 3;
+	private bool isLoading;
+	public string CurrentImg = "";
+	public string CurrentPathImg = "";
+	private async Task LoadFiles(InputFileChangeEventArgs e)
+	{
+		isLoading = true;
+		loadedFiles.Clear();
+
+		foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+		{
+			try
+			{
+				loadedFiles.Add(file);
+				Console.WriteLine(Path.GetRandomFileName());
+				var trustedFileNameForFileStorage = Path.GetRandomFileName() + file.Name;
+				CurrentImg = trustedFileNameForFileStorage;
+				var path = Path.Combine(Environment.ContentRootPath,
+						"wwwroot", "img", trustedFileNameForFileStorage);
+				CurrentPathImg = path;
+				await using FileStream fs = new(path, FileMode.Create);
+				await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+				//Img NewImg = new() { Imgname = trustedFileNameForFileStorage, path = path };
+				//var b = new Img().ToTable(NewImg); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+				//imgService.AddNewImg(b); //บันทึกข้อมูล
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+			}
+
+		}
+		isLoading = false;
+	}
+
+
+	public List<User> ListUser = new List<User>();
+
+	private User? UserLogin = new();
+	private User ModelUser = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+
+		var Users = await userService.GetUserAsync();
+		foreach (var user in Users)
+		{
+			ListUser.Add(new User().ToUi(user));
+		}
+
+		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+
+	}
+	private void OnClickEditUser()
+	{
+		@foreach (var User in ListUser.FindAll(e => e.UserID == UserLogin.UserID))
+		{
+			User.Department = UserLogin.Department;
+			User.Tel = UserLogin.Tel;
+			User.Password = UserLogin.Password;
+			User.UserImgName = CurrentImg;
+			User.UserPath = CurrentPathImg;
+			var a = new User().ToTable(User); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+			userService.EditUser(a); //บันทึกข้อมูล
+
+
+		}
+		UserLogin.Department = UserLogin.Department;
+		UserLogin.Tel = UserLogin.Tel;
+		UserLogin.Password = UserLogin.Password;
+	}
+
+
+}

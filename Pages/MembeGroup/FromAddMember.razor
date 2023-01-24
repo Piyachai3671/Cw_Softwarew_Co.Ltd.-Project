@@ -1,0 +1,224 @@
+﻿@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject UserService userService
+@inject GroupMemberService groupMemberService
+
+
+<div class="modal fade" id="FromAddMember" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="staticBackdropLabel">เพิ่มสมาชิก</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="container">
+					<div class="row">
+						<div class="col-12">
+
+							<div class="" style="">
+								<div class="topnav" style="">
+									<div class="search-container" style="">
+										<div class="">
+											<input type="text" placeholder="Search.." name="" @bind="SearchWord" @bind:event="oninput" />
+
+
+										</div>
+									</div>
+								</div>
+
+							</div>
+							<div class=" ">
+								<div class=" ">
+									<h5 class="mt-2">สมาชิกในระบบ</h5>
+									<div class="row mt-1 overflow-auto" style="height:300px; border:solid; border-color:#ddd;">
+										@if (ListUser == null)
+										{
+											<p>โปรดเพิ่มสมาชิก</p>
+										}
+										else
+										{
+											<table class="table table-hover">
+												<thead>
+													<tr>
+														<th scope="col">UserID</th>
+														<th scope="col">ชื่อ - นามสกุล</th>
+														<th scope="col">แผนก</th>
+														<th scope="col"></th>
+													</tr>
+												</thead>
+												<tbody>
+
+
+													@foreach (var ListUsers in ListUser.Where(
+															s => s.Username.ToUpper().Contains(SearchWord.ToUpper())
+															))
+													{
+
+
+														@if (ListUsers.GroupID != CurrentGroupID) @*ถ้ามีUserอยู่ในกลุ่มจะไม่มีUserทั้งหมดในListให้เลือก*@
+														{
+															@if (SelectedUser.Exists(e => e.UserID == ListUsers.UserID) == false)@*ถ้ามีUserที่ถูกเลือกชั่วคราวจะไม่แสดงรายชื่อให้เลือกซ้ำ Existsใช้เหมือนกับfindแต่ Exists รีเทริน *@
+															{
+																<tr>
+																	<td>@ListUsers.UserID</td>
+																	<td>@ListUsers.Username</td>
+																	<td>
+																		@ListUsers.Department
+																	</td>
+																	<td>
+																		<button class="btn btn-primary" @onclick="(()=> SelectUser(ListUsers))">
+																			เลือก
+																		</button>
+																	</td>
+																</tr>
+															}
+														}
+
+													}
+												</tbody>
+											</table>
+										}
+									</div>
+									<h5 class="mt-2">สมาชิกที่เลือก</h5>
+									<div class="row mt-2">
+										<div class="container overflow-auto" style="height:300px; border:solid; border-color:#ddd;">
+
+											<table class="table table-hover">
+												<thead>
+													<tr>
+														<th scope="col">UserID</th>
+														<th scope="col">ชื่อ - นามสกุล</th>
+														<th scope="col">แผนก</th>
+														<th scope="col"></th>
+													</tr>
+												</thead>
+												<tbody>
+													@if (SelectedUser.Count == 0)
+													{
+														<p>กรุณาเพิ่มสมาชิก</p>
+													}
+													else
+													{
+														@foreach (var SelectUsers in SelectedUser)
+														{
+
+															<tr>
+																<td>@SelectUsers.UserID</td>
+																<td>@SelectUsers.Username</td>
+																<td>
+																	@SelectUsers.Department
+																</td>
+																<td>
+																	<button class="btn btn-danger" @onclick="@(() =>  OnDelete(SelectUsers))">
+																		ลบ
+																	</button>
+																</td>
+															</tr>
+														}
+													}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-success" @onclick="AddMember ">ยืนยัน</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnCancel">ยกเลิก</button>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+@code {
+	private List<User> ListUser = new List<User>();
+	private List<GroupMember> ListGroupMember = new List<GroupMember>();
+	private string SelectedConfirm { get; set; } = string.Empty;
+	public string SearchWord { get; set; } = string.Empty;
+	List<string> options;
+
+	private List<User> DataSource = new List<User>();
+
+	List<User> SelectedUser = new List<User>();
+	List<User> DeletedUser = new List<User>();
+
+	private User? ShowUser;
+	List<User> Block = new List<User>();
+
+	[Parameter]
+	public EventCallback<List<User>> OnAddSelectedUser { get; set; }
+	[Parameter]
+	public int CurrentGroupID { get; set; }
+
+
+
+	private void AddMember()
+	{
+		OnAddSelectedUser.InvokeAsync(SelectedUser);
+		//var a = new User().ToTable(User new); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+		//userService.EditUser(a); //บันทึกข้อมูล
+		SelectedUser.Clear();
+
+
+	}
+
+	/*private void CurrentID()
+		{
+		CurrentGroupID.InvokeAsync(ListGroupMember);
+	}*/
+	private void FindUser()
+	{
+		ShowUser = ListUser.Find(x => x.Username.Contains(SearchWord));
+	}
+	private void SelectUser(User eleuser)
+	{
+		SelectedUser.Add(eleuser);
+		//Block = ListUser.Find(b => b.UserID == SelectedUser.);
+	}
+
+	void OnDelete(User listDataModel)
+	{
+		SelectedUser.Remove(listDataModel);
+		//SelectedUser.RemoveAt(SelectedUser.ToList<User>().FindIndex(e => e.Username == listDataModel.Username));
+	}
+
+	void OnCancel()
+	{
+		SelectedUser.Clear();
+
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (ListUser == null) return;
+		var Users = await userService.GetUserAsync();
+
+		foreach (var user in Users)
+		{
+			ListUser.Add(new User().ToUi(user));
+			//ListUser.Add(new User
+			//	{
+			//		UserID = user.UserID,
+			//		Username = user.Name,
+			//		Name = user.Name,
+			//		Department = user.Department,
+			//		Password = user.Password,
+			//		GroupID = user.GroupID
+			//	});
+
+		}
+
+	}
+
+}

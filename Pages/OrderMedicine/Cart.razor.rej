@@ -1,0 +1,47 @@
+diff a/Pages/OrderMedicine/Cart.razor b/Pages/OrderMedicine/Cart.razor	(rejected hunks)
+@@ -238,11 +238,43 @@
+ 	}
+ 
+ 	private void OnSubmit()
++	{
++		foreach (var a in Items)
++		{
++			if (a.Item1.AmountProduct > a.Item2)
++			{
++				a.Item1.AmountProduct = a.Item2;
++			}
++			else
++			{
++				CUToData();
++				ListCartProduct.Clear();
++			}
++		}
++	}
++	private void OnGoPageToResetCart()
++	{
++		NavigationManager.NavigateTo($"/order/");
++	}
++
++
++	//private void ShowNotification()
++	//{
++	//	var a = new NotificationMessage
++	//		{
++	//			Severity = NotificationSeverity.Success,
++	//			Summary = "สร้างคำสั่งซื้อสำเร็จ !",
++	//			Detail = "",
++	//			Duration = 5000,
++	//			CloseOnClick = true,
++	//			Payload = DateTime.Now
++	//		};
++	//	notificationservice.Notify(a);
++	//}
++	private void CUToData()
+ 	{
+ 		var CountOrder = ListOrders.Count();
+-		var CountOrderItem = ListOrderItems.Count();
+ 		var FindUerID = ListUser.Find(e => e.UserID == UserLogin.UserID);
+-
+ 		AddOrder = new Order()
+ 			{
+ 				OrderUserID = FindUerID.UserID,

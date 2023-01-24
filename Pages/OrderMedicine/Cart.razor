@@ -1,0 +1,362 @@
+﻿@using CW_ordermedicine.Data.Models;
+@using CW_ordermedicine.Data.Services;
+@inject CartProductService cartproductService
+@inject ProductService productService
+@inject OrderService orderService
+@inject OrderItemService orderItemService
+@inject NavigationManager NavigationManager
+@inject LoginService loginService
+@inject UserService userService
+@inject ReportService reportService
+@inject NotificationService notificationservice
+@page "/cart"
+
+@if (ListCartProduct == null)
+{
+	<p>คุณยังไม่ได้เพิ่มสินค้าลงในตระกล้า</p>
+}
+else
+{
+	<div class="container-fluid shadow" style="border-radius:10px; border:none;">
+
+		<div class="row">
+			<div class="row mb-3" style="text-align:center; background-color:aquamarine; margin-left:1px; padding:10px;">
+				<strong class="col " style="">ชื่อสินค้า</strong>
+				<strong class="col " style="">ราคา</strong>
+				<strong class="col">จำนวนคงเหลือ</strong>
+				<strong class="col">จำนวนที่เลือก</strong>
+				<strong class="col">ราคารวม</strong>
+				<div class="col-lg-1"></div>
+			</div>
+			@foreach (var IndexCartProduct in Items)
+			{
+				<div class="row mt-2" style="text-align:center;">
+
+					<div class="col-lg-3 ">
+						@IndexCartProduct.Item1.NameProduct
+					</div>
+					<div class="col ">
+						@IndexCartProduct.Item1.PriceProduct"
+					</div>
+
+					<div class="col">
+						จำนวน : @IndexCartProduct.Item2 @IndexCartProduct.Item1.UnitProduct
+					</div>
+
+					<div class="col d-inline-flex">
+						<buttonn class="btn btn-secondary" @onclick="()=>OnReduceAmount(IndexCartProduct.Item1.Cartid)">-</buttonn>
+						<input class="form-control @(true ? "red":"blue")" type="number" @bind="@IndexCartProduct.Item1.AmountProduct"
+					   style="width:60px" max="@IndexCartProduct.Item2">
+						<buttonn class="btn btn-secondary" @onclick="()=>OnAddAmount(IndexCartProduct.Item1.Cartid)">+</buttonn>
+					</div>
+
+					<div class="col">
+						@{
+							SumPrice = IndexCartProduct.Item1.PriceProduct * IndexCartProduct.Item1.AmountProduct;
+						}
+						@SumPrice บาท
+					</div>
+
+
+					<div class="col-lg-1" style="text-align:end;">
+						<button class="btn btn-danger" @onclick="@(() =>OnDeleteCartProduct(IndexCartProduct))"><i class="fa-solid fa-trash-can"></i></button>
+					</div>
+				</div>
+			}
+
+
+
+		</div>
+		<hr>
+		<div class="row " style="text-align:end;">
+			<div class="col">
+
+				<div class="me-5">Total : @SumTotal บาท</div>
+
+				<RadzenButton Text="ชำระเงิน" ButtonStyle="ButtonStyle.Success" Style="font-size:18px;margin-bottom:10px;"
+						  Click="@OnSubmit" />
+			</div>
+
+		</div>
+
+	</div>
+
+}
+@if (IsShowError == true)
+{
+	<div class="ErrorShowout bg-black bg-opacity-50 d-flex justify-content-center " style="position:absolute;z-index:1;">
+		<div style="position:absolute; left:85%; top:5%;">
+			<i @onclick="OnCloseShowError" class="fa-solid fa-circle-xmark" style="font-size:30px;color:orangered;cursor:pointer"></i>  <!--ปุ่มปิดกากบาท-->
+		</div>
+		<div class="row mb-2 d-inline-flex justify-content-end position-relative" style="bottom:-2%;left:80%;">
+		</div>
+		<div class="bg-white ErrorShowin" style="position:relative; top:70px;">
+			<div class="card">
+				<div class="card-header">แจ้งเตืออน</div>
+				<div class="card-body d-flex justify-content-center align-items-center " style="position:relative;top:30px;">
+					มีการเลือกจำนวนสินค้าเกินกว่ากำหนด กรุณาทำรายการอีกครั้ง
+				</div>
+				<div class="card-footer" style="position:relative;top:60px;">
+					<div class="" style="text-align:end; ">
+						<button class="btn btn-primary" @onclick="OnCloseShowError">
+							ตกลง
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+
+@code {
+	private double? SumPrice = 0;
+	private double SumTotal = 0;
+	private int Amount = 0;
+
+	private List<CartProduct> TotalPriceCartProduct = new List<CartProduct>();
+	private List<CartProduct> ListCartProduct = new List<CartProduct>();
+	private List<Product> ListProduct = new List<Product>();
+	private List<Tuple<CartProduct, int>> Items;
+	private List<Product> AddProduct = new List<Product>();
+	private List<Order> ListOrders = new List<Order>();
+	private List<OrderItem> ListOrderItems = new List<OrderItem>();
+	private User? UserLogin = new();
+	private List<User> ListUser = new List<User>();
+	private Order AddOrder = new();
+	private OrderItem AddOrderItem = new();
+	private Report AddReport = new();
+
+
+	/*[Parameter]
+	public EventCallback<List<CartProduct>> OnSubmitSelectedProduct { get; set; }*/
+
+	//int CountOrder = ListOrder.Count();
+
+	protected override async Task OnInitializedAsync()
+	{
+		//ListOrderItems = await orderItemService.GetOrderItemServices();
+		var OrderItems = await orderItemService.GetOrderItemServices();
+		foreach (var orderitem in OrderItems)
+		{
+			ListOrderItems.Add(new OrderItem().ToUi(orderitem));
+		}
+
+		ListCartProduct = await cartproductService.GetCartProductsAsync();
+		//ListProduct = await productService.GetProductsAsync();
+		var Products = await productService.GetProductsAsync();
+		foreach (var Product in Products)
+		{
+			ListProduct.Add(new Product().ToUi(Product));
+		}
+		Calculate();
+
+		var Orders = await orderService.GetOrderAsync();
+		foreach (var order in Orders)
+		{
+			ListOrders.Add(new Order().ToUi(order));
+		}
+
+		var Users = await userService.GetUserAsync();
+		foreach (var user in Users)
+		{
+			ListUser.Add(new User().ToUi(user));
+			//ListUser.Add(new User
+			//	{
+			//		UserID = user.UserID,
+			//		Username = user.Name,
+			//		Name = user.Name,
+			//		Department = user.Department,
+			//		Password = user.Password,
+			//		GroupID = user.GroupID
+			//	});
+
+		}
+
+
+		var i = from c in ListCartProduct
+				join p in ListProduct
+				on c.Cartid equals p.IDProduct
+				select (new Tuple<CartProduct, int>(c, (p.RemainderProduct ?? 0)));
+		Items = i.ToList();
+		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+	}
+
+
+
+	private void OnAddAmount(int ID)
+	{
+		var a = ListCartProduct.Find(ListProduct => ListProduct.Cartid == ID);
+		var b = ListProduct.Find(ListProduct => ListProduct.IDProduct == ID);
+		a.AmountProduct++;
+
+		SumTotal = 0;
+
+		if (a.AmountProduct > b.RemainderProduct)
+		{
+			a.AmountProduct = b.RemainderProduct;
+
+		}
+		a.SumPriceProduct = a.PriceProduct * a.AmountProduct; //ทุกครั้งที่มีการกดเพิ่มสินค้าจะมีการเก็บค่าใน LCP.Sumprice
+		@foreach (var c in ListCartProduct)
+		{
+			SumTotal = SumTotal + (c.AmountProduct * c.PriceProduct) ?? 0.0;
+		}
+	}
+	private void OnReduceAmount(int ID)
+	{
+
+		var a = ListCartProduct.Find(ListProduct => ListProduct.Cartid == ID);
+		var b = ListProduct.Find(ListProduct => ListProduct.IDProduct == ID);
+		a.AmountProduct -= 1;
+		SumTotal = 0;
+		@if (a.AmountProduct < 1)
+		{
+			a.AmountProduct = 1;
+		}
+		@foreach (var c in ListCartProduct)
+		{
+			SumTotal = SumTotal + ((c.AmountProduct * c.PriceProduct) ?? 0.0);
+		}
+	}
+	private void OnDeleteCartProduct(Tuple<CartProduct, int> c)
+	{
+		Items.Remove(c);
+		ListCartProduct.Remove(c.Item1);
+		Calculate();
+	}
+
+	private void Calculate()
+	{
+
+		SumTotal = (ListCartProduct.Sum(e => e.PriceProduct! * e.AmountProduct!)) ?? 0.0;
+
+	}
+	private bool CheckConfirm = false;
+	private void OnSubmit()
+	{
+		foreach (var a in Items)
+		{
+			if (a.Item1.AmountProduct == 0)
+			{ }
+			if (a.Item1.AmountProduct > a.Item2)
+			{
+				a.Item1.AmountProduct = a.Item2;
+				ShowError();
+				return;
+			}
+		}
+		CheckConfirm = true;
+		if (CheckConfirm == true)
+		{
+			CUToData();
+			ListCartProduct.Clear();
+		}
+		
+	}
+	private void CUToData()
+	{
+		var CountOrder = ListOrders.Count();
+		var CountOrderItem = ListOrderItems.Count();
+		var FindUerID = ListUser.Find(e => e.UserID == UserLogin.UserID);
+
+		AddOrder = new Order()
+			{
+				OrderUserID = FindUerID.UserID,
+				OrderUsername = FindUerID.Name,
+				OrderGroupID = FindUerID.GroupID,
+				OrderDepartment = FindUerID.Department,
+
+				OrderDateCreate = DateTime.Now,
+				OrderStatus = "PreOrder",
+
+				OrderSumPrice = ListCartProduct.Sum(e => e.PriceProduct * e.AmountProduct) ?? 0.0,
+			};
+		var AddOrder2 = new Order().ToTable(AddOrder);
+		orderService.AddNewOrder(AddOrder2); //บันทึกข้อมูล
+
+
+		foreach (var CartProduct in ListCartProduct)
+		{
+			AddOrderItem = new OrderItem()
+				{
+					OrderItemProductID = CartProduct.IDProduct,
+					OrderItemProductName = CartProduct.NameProduct,
+					OrderItemProductAmount = CartProduct.AmountProduct,
+					OrderItemProductPrice = CartProduct.PriceProduct,
+					OrderItemProductSumPrice = CartProduct.PriceProduct * CartProduct.AmountProduct,
+					OrderItemOrderID = CountOrder + 1,
+				};
+
+
+			var AddOrderItem2 = new OrderItem().ToTable(AddOrderItem);
+			orderItemService.AddNewOrderItem(AddOrderItem2); //บันทึกข้อมูล
+			foreach (var Product in ListProduct.FindAll(p => p.IDProduct == CartProduct.IDProduct))
+			{
+				Product.RemainderProduct = Product.RemainderProduct - CartProduct.AmountProduct;
+				var a = new Product().ToTable(Product); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+				productService.EditProduct(a); //บันทึกข้อมูล
+			}
+		}
+		AddReport = new Report()
+			{
+				ReportUserID = FindUerID.UserID,
+				ReportUserName = FindUerID.Name,
+
+				ReportGroupID = FindUerID.GroupID,
+				ReportDepartment = FindUerID.Department,
+				ReportOrderID = CountOrder + 1,
+				ReportOrderItemID = CountOrder + 1,
+				ReportDate = DateTime.Now,
+				ReportStatus = "PreOrder",
+			};
+		var AddReport2 = new Report().ToTable(AddReport);
+		reportService.AddNewReport(AddReport2); //บันทึกข้อมูล
+		ShowNotification();
+		OnGoPageToResetCart();
+
+	}
+	private void OnGoPageToResetCart()
+	{
+		NavigationManager.NavigateTo($"/order/");
+	}
+
+	bool showModal = false;
+
+	//void ModalShow() => showModal = true;
+
+	void ModalCancel() => showModal = false;
+
+	void ModalOk()
+	{
+		Console.WriteLine("Modal ok");
+		showModal = false;
+	}
+
+	private void ShowNotification()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Success,
+				Summary = "สร้างคำสั่งซื้อสำเร็จ !",
+				Detail = "",
+				Duration = 5000,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
+	private bool IsShowError = false;
+	private void ShowError()
+	{
+		IsShowError = !IsShowError;
+	}
+	public void OnCloseShowError()
+	{
+		IsShowError = !IsShowError;
+	}
+}
+
+
+
+

@@ -1,0 +1,43 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace CW_ordermedicine.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="CW_ordermedicine.styles.css" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="favicon.png"/>
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
+
+    
+</head>
+<body>
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+
+    <script src="https://kit.fontawesome.com/d156a9a2ea.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+
+    <script src="_content/BlazorInputFile/inputfile.js"></script>
+</body>
+</html>

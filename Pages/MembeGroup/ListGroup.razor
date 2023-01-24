@@ -1,0 +1,154 @@
+﻿@page "/list-group/{GetCurrentGroupIDPage:int}"
+
+@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject UserService userService
+@inject GroupMemberService groupmemberService
+@inject LoginService loginService
+
+<!--
+@if (adduser == null)
+{
+	<p>Loading </p>
+}
+else
+{
+	<RadzenGrid AllowPaging="true" AllowFiltering="true"
+		PageSize="2" AllowSorting="true" Data="@adduser" TItem="AddUser" ColumnWidth="150px">
+		<Columns>
+			<RadzenGridColumn TItem="AddUser" Property="UserID" Title="User ID" ></RadzenGridColumn>
+			<RadzenGridColumn TItem="AddUser" Property="Email" Title="Email"></RadzenGridColumn>
+			<RadzenGridColumn TItem="AddUser" Property="Username" Title="Username"></RadzenGridColumn>
+			<RadzenGridColumn TItem="AddUser" Property="Department" Title="Department"></RadzenGridColumn>
+
+		</Columns>
+	</RadzenGrid>
+}
+-->
+<!-- รูปแบบเก่าที่ไม่ใช้ Component -->
+<div class="">
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th scope="col">#</th>
+				<th scope="col">Img</th>
+
+				<th scope="col">Name Lastname</th>
+				<th scope="col">Department</th>
+				<th scope="col">Edit member</th>
+			</tr>
+		</thead>
+		<tbody>
+			@if (ListUser == null)
+			{
+				<tr>
+					<th scope="row">
+						<img class="rounded-3" style="width:30px; height:30px;" src="" alt="รูปเสียหาย">
+					</th>
+					<td>ไม่มีข้อมูล</td>
+					<td>ไม่มีข้อมูล</td>
+					<td>
+					</td>
+				</tr>
+			}
+			else
+			{
+				@foreach (var ListUsers in ListUser.FindAll(e => e.GroupID == GetCurrentGroupIDPage))
+				{
+
+					CountPeople();
+
+					<tr>
+						<td>@AmountPeople</td>
+						<th scope="row">
+							<img class="rounded-3" style="width:30px; height:30px;" src="https://cdn.pixabay.com/photo/2022/10/31/12/43/mountain-7559738_1280.jpg">
+						</th>
+						<td>@ListUsers.Username</td>
+						<td>@ListUsers.Department</td>
+
+						<td>
+							<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>OnDeleteMember(ListUsers)">
+								Delete Member
+							</div>
+						</td>
+					</tr>
+
+				}
+			}
+
+		</tbody>
+
+	</table>
+</div>
+<div class="position-sticky" style=" bottom:0px; text-align:end;  ">
+	<div class="row">
+		<div class="">
+			<button class="btn btn-success shadow mt-1 mb-2" style="border-radius:50%; font-size:30px; border:none;" data-bs-toggle="modal" data-bs-target="#FromAddMember">
+				<i class="fa-solid fa-plus" style="font-size:30px;"></i>
+			</button>
+		</div>
+	</div>
+</div>
+
+<FromAddMember OnAddSelectedUser="RefreshMember" CurrentGroupID="GetCurrentGroupIDPage"></FromAddMember>
+
+@code {
+	[Parameter]
+	public int GetCurrentGroupIDPage { get; set; }
+
+	private List<User> ListUser = new List<User>();
+	private int AmountPeople = 0;
+	private List<GroupMember> ListGroupMember = new List<GroupMember>();
+	private List<User> Model = new List<User>();
+	private User? UserLogin = new();
+	private User? UserE = new();
+
+	//private List<User?> User = new();
+	protected override async Task OnInitializedAsync()
+	{
+		var Users = await userService.GetUserAsync();
+		foreach (var user in Users)
+		{
+			ListUser.Add(new User().ToUi(user));
+		}
+
+		//ListGroupMember = await groupmemberService.GetGroupAsync();
+		//UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+	}
+
+	private void OnDeleteMember(User eleuser)
+	{
+		//ListUser.Add(new User()
+		//	{
+		//		UserID = eleuser.UserID,
+		//		Username = eleuser.Username,
+		//		Department = eleuser.Department,
+		//		GroupID = 0
+
+		//	});
+		eleuser.GroupID = 0;
+		var a = new User().ToTable(eleuser); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+		userService.EditUser(a); //บันทึกข้อมูล
+		ListUser.Remove(eleuser);
+	}
+	private void CountPeople()
+	{
+		AmountPeople++;
+	}
+
+	private void RefreshMember(List<User> SelectedUser)
+	{
+		foreach (var SelectedUsers in SelectedUser)
+		{
+			ListUser.Add(SelectedUsers);
+			SelectedUsers.GroupID = GetCurrentGroupIDPage;
+
+			var a = new User().ToTable(SelectedUsers); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+			userService.EditUser(a); //บันทึกข้อมูล
+
+		}
+
+	}
+
+}
+

@@ -1,0 +1,319 @@
+﻿@page "/orderbill/{GetOrderIDPage:int}"
+@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject OrderService orderService
+@inject UserService userService
+@inject CartProductService cartproductService
+@inject LoginService loginService
+@inject OrderItemService orderItemService
+@inject ReportService reportService
+@inject NavigationManager NavigationManager
+
+@foreach (var Order in ListOrders)
+{
+	@if (Order.OrderID == GetOrderIDPage)
+	{
+		<div class="card mb-2" style="">
+			<div class="card-header" style="">รายละเอียดประวัติผู้ทำรายการ</div>
+
+			<div class="card-body" style="background-color:coral;">
+
+				<div class="row" style="">
+					<div class="row mt-2">
+						<div class="col-lg-1">
+							<label>ชื่อ :  </label>
+						</div>
+						<div class="col d-inline-flex">
+							@Order.OrderUsername
+						</div>
+					</div>
+
+					<div class="row mt-2">
+						<div class="col">
+							<div class="row">
+								<div class="col-lg-3">
+									<label>แผนก :  </label>
+								</div>
+								<div class="col">
+									@Order.OrderDepartment
+								</div>
+							</div>
+						</div>
+						<div class="col mb-2">
+							<div class="row">
+								<div class="col-lg-3">
+									<label>กลุ่ม :</label>
+								</div>
+								<div class="col">
+									@Order.OrderGroupID
+								</div>
+							</div>
+						</div>
+
+						<div class="col mb-2">
+							<div class="row">
+								<div class="col-lg-3">
+									<label>เบอร์โทร :</label>
+								</div>
+								<div class="col">
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+		@if (Order.OrderStatus == "PreOrder" && Order.OrderID == GetOrderIDPage)
+		{
+			<div class="card mt-3">
+				<div class="card-header ">
+					จัดการสถานะคำสั่งซื้อ
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-lg-1">
+							<label>วันที่สั่งสินค้า : </label>
+						</div>
+						<div class="col">
+							<label>@Order.OrderDateCreate</label>
+						</div>
+
+					</div>
+					<div class="row">
+						<div class="col">
+							@Order.OrderID
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-success" @onclick="OnChangeStatusToSuccess">
+								ยืนยันคำสั่งซื้อ
+							</button>
+						</div>
+
+						<div class="col " style="text-align:center;" @onclick="OnChangeStatusToCancel">
+							<button class="btn btn-danger">
+								ยกลเลิกคำสั่งซื้อ
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		}
+
+		@if (Order.OrderStatus == "Success" && Order.OrderID == GetOrderIDPage)
+		{
+			<div class="card mt-3">
+				<div class="card-header ">
+					จัดการสถานะคำสั่งซื้อ
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-lg-2">
+							<label>วันที่ทำรายการ : </label>
+						</div>
+						<div class="col">
+							<label>@Order.OrderDateCreate</label>
+						</div>
+
+					</div>
+					<div class="row">
+						<div class="col-lg-2">
+							<label>รหัสคำสั่งซื้อ : </label>
+						</div>
+						<div class="col">
+							@Order.OrderID
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน A4
+							</button>
+						</div>
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน 9x11
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+
+		@if (Order.OrderID == GetOrderIDPage)
+		{
+			<div class="container-fluid mt-3">
+
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th scope="col">ที่</th>
+							<th scope="col">สินค้า</th>
+
+							<th scope="col">จำนวน</th>
+							<th scope="col">ราคา/ชิ้น</th>
+							<th scope="col">ราคารวม</th>
+
+						</tr>
+					</thead>
+
+					<tbody>
+						@foreach (var OrderItem in ListOrderItems)
+						{
+							@if (Order.OrderID == OrderItem.OrderItemOrderID)
+							{
+								<tr>
+									<th scope="row"></th>
+									<td>@OrderItem.OrderItemProductName </td>
+									<td>@OrderItem.OrderItemProductAmount</td>
+									<td>@OrderItem.OrderItemProductPrice</td>
+									<td>@OrderItem.OrderItemProductSumPrice</td>
+								</tr>
+							}
+
+						}
+
+					</tbody>
+					<tfoot>
+						<tr>
+							<th style="text-align:center;" colspan="4">รวม</th>
+							@if (Order.OrderID == GetOrderIDPage)
+							{
+								<th style="" colspan="1">@Order.OrderSumPrice</th>
+							}
+						</tr>
+					</tfoot>
+				</table>
+
+			</div>
+		}
+	}
+}
+
+@code {
+
+	[Parameter]
+	public int GetOrderIDPage { get; set; }
+
+	private List<Order> ListOrders = new List<Order>();
+	private List<User> ListUser = new List<User>();
+	private List<CartProduct> ListCartProduct = new List<CartProduct>();
+	private User? UserLogin = new();
+
+	private List<OrderItem>? ListOrderItems = new List<OrderItem>();
+	private List<Report>? ListReports = new List<Report>();
+	private Report AddReport = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		var OrderItems = await orderItemService.GetOrderItemServices();
+		foreach (var orderitem in OrderItems)
+		{
+			ListOrderItems.Add(new OrderItem().ToUi(orderitem));
+		}
+		//ListOrders = await orderService.GetOrderAsync();
+		var Orders = await orderService.GetOrderAsync();
+		foreach (var order in Orders)
+		{
+			ListOrders.Add(new Order().ToUi(order));
+		}
+		var Users = await userService.GetUserAsync();
+		foreach (var user in Users)
+		{
+			ListUser.Add(new User().ToUi(user));
+			//ListUser.Add(new User
+			//	{
+			//		UserID = user.UserID,
+			//		Username = user.Name,
+			//		Name = user.Name,
+			//		Department = user.Department,
+			//		Password = user.Password,
+			//		GroupID = user.GroupID
+			//	});
+
+		}
+
+		var Reports = await reportService.GetReportsAsync();
+		foreach (var Report in Reports)
+		{
+			ListReports.Add(new Report().ToUi(Report));
+		}
+
+		ListCartProduct = await cartproductService.GetCartProductsAsync();
+		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+
+	}
+
+	private Order Orde = new Order();
+	private void OnChangeStatusToSuccess()
+	{
+		var FindUerID = ListUser.Find(e => e.UserID == UserLogin.UserID);
+		@foreach (var Order in ListOrders)
+		{
+			@if (Order.OrderID == GetOrderIDPage && Order.OrderStatus == "PreOrder")
+			{
+				Order.OrderStatus = "Success";
+				var a = new Order().ToTable(Order); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+				orderService.EditOrder(a); //บันทึกข้อมูล
+
+				//var CountOrder = ListOrders.Count();
+				//AddReport = new Report()
+				//	{
+
+				//		ReportUserID = FindUerID.UserID,
+				//		ReportUserName = FindUerID.Name,
+
+				//		ReportGroupID = FindUerID.GroupID,
+				//		ReportDepartment = FindUerID.Department,
+				//		ReportOrderID = CountOrder + 1,
+				//		ReportOrderItemID = CountOrder + 1,
+				//		ReportDate = DateTime.Now,
+				//		ReportStatus = "Success",
+
+				//		ReportPriceSum = Order.OrderSumPrice,
+				//	};
+				//var AddReport2 = new Report().ToTable(AddReport);
+				//reportService.AddNewReport(AddReport2); //บันทึกข้อมูล
+			}
+			@foreach (var Report in ListReports)
+			{
+				@if (Report.ReportID == GetOrderIDPage)
+				{
+					Report.ReportDate = DateTime.Now;
+					Report.ReportStatus = "Success";
+					Report.ReportPriceSum = Order.OrderSumPrice;
+					var a = new Report().ToTable(Report); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+					reportService.EditReport(a); //บันทึกข้อมูล
+				}
+			}
+		}
+
+		OnGoPageToReport();
+	}
+	private void OnChangeStatusToCancel()
+	{
+		@foreach (var Order in ListOrders)
+		{
+			@if (Order.OrderID == GetOrderIDPage && Order.OrderStatus == "PreOrder")
+			{
+				Order.OrderStatus = "Cancel";
+				var a = new Order().ToTable(Order); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+				orderService.EditOrder(a); //บันทึกข้อมูล
+			}
+		}
+	}
+	private void OnGoPageToReport()
+	{
+		NavigationManager.NavigateTo($"/report-page/");
+	}
+
+}

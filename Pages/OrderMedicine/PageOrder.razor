@@ -1,0 +1,302 @@
+﻿@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject OrderService orderService
+@inject NavigationManager NavigationManager
+
+@page "/pageorder"
+
+<HeadBill></HeadBill>
+<div class="card mb-2">
+        <div class="card-header" >รายละเอียดการสั่งซื้อสินค้า</div>
+        
+    
+    <div class="card-body" style="background-color:aquamarine;">
+        <div class="row" style="">
+
+            <div class="row">
+                <div class="col">
+                    <div class="row mb-3" style="text-align:center;">
+                        <div class="col">
+                            <label>วันที่สั่งสินค้า :</label>
+                            <input type="date" style="width:40%;" />
+                            <label>เวลา :</label>
+                            <input type="time" id="" name=""
+                                   min="09:00" max="18:00" required>
+                            <button class="btn btn-success   ms-3">
+                                ค้นหา
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="text-align:center; margin-top:10px;">
+    <a href="buyorder">
+        <!-- ไปไฟล์ buyorder -->
+        <button class="btn btn-primary mb-2">
+            สั่งซื้อสินค้า
+        </button>
+    </a>
+</div>
+
+<!------------     คำสั่งซื้อ PreOrder      ------------------->
+<div class="card" style="">
+    <div class="card-header">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id=""  @bind="CheckBoxPreOrder">
+            <strong class="form-check-label" for="flexCheckChecked">
+                สั่งซื้อสินค้า : เตรียมรายการ
+            </strong>
+        </div>
+    </div>
+
+    @if (CheckBoxPreOrder == true)
+    {
+        <div class="card-body">
+
+            <!-- Click แล้ว Show ข้างล่าง -->
+
+            <div class="row" style="text-align:center;border:outset ">
+                <table>
+                    <thead style="background-color:aquamarine;">
+                        <tr>
+                            <th style="border:ridge;">สถานะ</th>
+                            <th style="border:ridge;">เลขที่</th>
+                            <th style="border:ridge;">วันที่</th>
+                            <th style="border:ridge;">ชื่อ</th>
+                            <th style="border:ridge;">จำนวน(สั่ง)</th>
+                            <th style="border:ridge;">ยอดรวม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var Order in ListOrders)
+                        {
+                            @if (Order.OrderStatus == "PreOrder")
+                            {
+                                <tr>
+                                    <td>
+                                        @Order.OrderStatus
+                                    </td>
+                                    <button class="btn btn-link" @onclick="()=>OpenOrderBillPage(Order.OrderID)">
+                                    <td>@Order.OrderID POS-15-12-65</td>
+                                    </button>
+
+                                    <td>@Order.OrderDateCreate</td>
+                                    <td>@Order.OrderUsername</td>
+                                    <td>@Order.OrderSumPrice บาท</td>
+                                </tr>
+                            }
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <br />
+        </div>
+    }
+   
+    
+</div>
+
+
+<!------------     คำสั่งซื้อ ConfirmOrder      ------------------->
+<div class="card" style="">
+    <div class="card-header">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="" @bind="CheckBoxConfirmOrder">
+            <strong class="form-check-label" for="flexCheckChecked">
+                สั่งซื้อสินค้า : ยืนยัน
+            </strong>
+        </div>
+    </div>
+
+    @if (CheckBoxConfirmOrder == true)
+    {
+        <div class="card-body">
+
+            <!-- Click แล้ว Show ข้างล่าง -->
+
+            <div class="row" style="text-align:center;border:outset ">
+                <table>
+                    <thead style="background-color:aquamarine;">
+                        <tr>
+                            <th style="border:ridge;">สถานะ</th>
+                            <th style="border:ridge;">เลขที่</th>
+                            <th style="border:ridge;">วันที่</th>
+                            <th style="border:ridge;">ชื่อ</th>
+                            <th style="border:ridge;">จำนวน(สั่ง)</th>
+                            <th style="border:ridge;">ยอดรวม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var Order in ListOrders)
+                        {
+                            @if (Order.OrderStatus == "Confirm")
+                            {
+                                <tr>
+                                    <td>
+                                        @Order.OrderStatus
+                                    </td>
+                                    <button class="btn btn-link" @onclick="()=>OpenOrderBillPage(Order.OrderID)">
+                                    <td>@Order.OrderID POS-15-12-65</td>
+                                    </button>
+
+                                    <td>@Order.OrderDateCreate</td>
+                                    <td>@Order.OrderSumPrice บาท</td>
+                                </tr>
+                            }
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <br />
+        </div>
+    }
+
+
+</div>
+
+<!------------     คำสั่งซื้อ SuccessOrder      ------------------->
+<div class="card" style="">
+    <div class="card-header">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="" @bind="CheckBoxSuccessOrder">
+            <strong class="form-check-label" for="flexCheckChecked">
+                สั่งซื้อสินค้า : สำเร็จ
+            </strong>
+        </div>
+    </div>
+
+    @if (CheckBoxSuccessOrder == true)
+    {
+        <div class="card-body">
+
+            <!-- Click แล้ว Show ข้างล่าง -->
+
+            <div class="row" style="text-align:center;border:outset ">
+                <table>
+                    <thead style="background-color:aquamarine;">
+                        <tr>
+                            <th style="border:ridge;">สถานะ</th>
+                            <th style="border:ridge;">เลขที่</th>
+                            <th style="border:ridge;">วันที่</th>
+                            <th style="border:ridge;">ชื่อ</th>
+                            <th style="border:ridge;">จำนวน(สั่ง)</th>
+                            <th style="border:ridge;">ยอดรวม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var Order in ListOrders)
+                        {
+                            @if (Order.OrderStatus == "Success")
+                            {
+                                <tr>
+                                    <td>
+                                        @Order.OrderStatus
+                                    </td>
+                                    <button class="btn btn-link" @onclick="()=>OpenOrderBillPage(Order.OrderID)">
+                                    <td>@Order.OrderID POS-15-12-65</td>
+                                    </button>
+
+                                    <td>@Order.OrderDateCreate</td>
+                                    <td>@Order.OrderUsername</td>
+                                    <td>@Order.OrderSumPrice บาท</td>
+                                </tr>
+                            }
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <br />
+        </div>
+    }
+
+
+</div>
+
+<!------------     คำสั่งซื้อ CancelOrder      ------------------->
+<div class="card" style="">
+    <div class="card-header">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="" @bind="CheckBoxCancelOrder">
+            <strong class="form-check-label" for="flexCheckChecked">
+                สั่งซื้อสินค้า : ยกเลิก
+            </strong>
+        </div>
+    </div>
+
+    @if (CheckBoxCancelOrder == true)
+    {
+        <div class="card-body">
+
+            <!-- Click แล้ว Show ข้างล่าง -->
+
+            <div class="row" style="text-align:center;border:outset ">
+                <table>
+                    <thead style="background-color:aquamarine;">
+                        <tr>
+                            <th style="border:ridge;">สถานะ</th>
+                            <th style="border:ridge;">เลขที่</th>
+                            <th style="border:ridge;">วันที่</th>
+                            <th style="border:ridge;">ชื่อ</th>
+                            <th style="border:ridge;">จำนวน(สั่ง)</th>
+                            <th style="border:ridge;">ยอดรวม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var Order in ListOrders)
+                        {
+                            @if (Order.OrderStatus == "Cancel")
+                            {
+                                <tr>
+                                    <td>
+                                        @Order.OrderStatus
+                                    </td>
+                                    <button class="btn btn-link" @onclick="()=>OpenOrderBillPage(Order.OrderID)">
+                                    <td>@Order.OrderID POS-15-12-65</td>
+                                    </button>
+
+                                    <td>@Order.OrderDateCreate</td>
+                                    <td>@Order.OrderUsername</td>
+                                    <td>@Order.OrderSumPrice บาท</td>
+                                </tr>
+                            }
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <br />
+        </div>
+    }
+
+
+</div>
+@code{
+    public bool CheckBoxPreOrder = true;
+    public bool CheckBoxConfirmOrder = true;
+    public bool CheckBoxSuccessOrder = true;
+    public bool CheckBoxCancelOrder = true;
+    private List<Order> ListOrders = new List<Order>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //ListOrder = await orderService.GetOrderAsync();
+        var Orders = await orderService.GetOrderAsync();
+        foreach (var order in Orders)
+        {
+            ListOrders.Add(new Order().ToUi(order));
+        }
+    }
+    private void OpenOrderBillPage(int SentOrderIDPage)
+    {
+        NavigationManager.NavigateTo($"/orderbill/{SentOrderIDPage}");
+    }
+}
+
