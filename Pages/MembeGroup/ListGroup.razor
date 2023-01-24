@@ -5,7 +5,7 @@
 @inject UserService userService
 @inject GroupMemberService groupmemberService
 @inject LoginService loginService
-
+@inject NotificationService notificationservice
 <!--
 @if (adduser == null)
 {
@@ -27,6 +27,16 @@ else
 -->
 <!-- รูปแบบเก่าที่ไม่ใช้ Component -->
 <div class="">
+
+	@foreach (var Group in ListGroupMember.FindAll(e => e.GroupID == GetCurrentGroupIDPage))
+	{
+		<h2 class="">
+			กลุ่ม : @Group.GroupName
+		</h2>
+	}
+
+</div>
+<div class="">
 	<table class="table table-hover">
 		<thead>
 			<tr>
@@ -39,42 +49,58 @@ else
 			</tr>
 		</thead>
 		<tbody>
-			@if (ListUser == null)
+
+			@for (int i = 0; i < ListUsers.Count; i++)
 			{
-				<tr>
-					<th scope="row">
-						<img class="rounded-3" style="width:30px; height:30px;" src="" alt="รูปเสียหาย">
-					</th>
-					<td>ไม่มีข้อมูล</td>
-					<td>ไม่มีข้อมูล</td>
-					<td>
-					</td>
-				</tr>
-			}
-			else
-			{
-				@foreach (var ListUsers in ListUser.FindAll(e => e.GroupID == GetCurrentGroupIDPage))
+				
+				@if (ListUsers[i].GroupID == GetCurrentGroupIDPage)
 				{
+					var tempint = i;
 
-					CountPeople();
-
+					@*@foreach(var User in ListUsers.FindAll(e => e.GroupID == GetCurrentGroupIDPage))
+						{*@
 					<tr>
-						<td>@AmountPeople</td>
+						<td>@(i+1)</td>
 						<th scope="row">
-							<img class="rounded-3" style="width:30px; height:30px;" src="https://cdn.pixabay.com/photo/2022/10/31/12/43/mountain-7559738_1280.jpg">
+							<img class="rounded-3" style="width:30px; height:30px;" src="img/@ListUsers[i].UserImgName">
 						</th>
-						<td>@ListUsers.Username</td>
-						<td>@ListUsers.Department</td>
+						<td>@ListUsers[i].Username</td>
+						<td>@ListUsers[i].Department</td>
 
 						<td>
-							<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>OnDeleteMember(ListUsers)">
+							<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>OnDeleteMember(ListUsers[tempint])">
 								Delete Member
 							</div>
 						</td>
 					</tr>
-
 				}
 			}
+			
+			<!--
+				<RadzenDataGrid FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
+							PageSize="10" Data="@ListUsers.Where(e=>e.GroupID == GetCurrentGroupIDPage)" TItem="User" ColumnWidth="150px">
+					<Columns>
+
+						<RadzenDataGridColumn TItem="User" Title="ดูรายละเอียดเพิ่มเติม">
+			@*<Template Context="data">
+						<RadzenButton Click=@(args => OpenOrderBillPage(data.OrderID))
+								  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" />
+					</Template>*@
+						</RadzenDataGridColumn>
+					<RadzenDataGridColumn TItem="User" Property="UserImgName" Title="รูป" >
+						<Template Context="User">
+							<RadzenImage Path="@($"data:img/")" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
+
+						</Template>
+					</RadzenDataGridColumn>
+					<RadzenDataGridColumn TItem="User" Property="Name" Title="ชื่อ - สกุล / บาท" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+					<RadzenDataGridColumn TItem="User" Property="Department" Title="แผนก" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+						<RadzenDataGridColumn TItem="User" Property="" Title="" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+
+					</Columns>
+				</RadzenDataGrid>
+			-->
+
 
 		</tbody>
 
@@ -96,20 +122,27 @@ else
 	[Parameter]
 	public int GetCurrentGroupIDPage { get; set; }
 
-	private List<User> ListUser = new List<User>();
+	private List<User> ListUsers = new List<User>();
+	private int CountMember;
 	private int AmountPeople = 0;
 	private List<GroupMember> ListGroupMember = new List<GroupMember>();
 	private List<User> Model = new List<User>();
 	private User? UserLogin = new();
 	private User? UserE = new();
-
+	int i = 1;
 	//private List<User?> User = new();
 	protected override async Task OnInitializedAsync()
 	{
 		var Users = await userService.GetUserAsync();
 		foreach (var user in Users)
 		{
-			ListUser.Add(new User().ToUi(user));
+			ListUsers.Add(new User().ToUi(user));
+		}
+
+		var Groups = await groupmemberService.GetGroupAsync();
+		foreach (var Group in Groups)
+		{
+			ListGroupMember.Add(new GroupMember().ToUi(Group));
 		}
 
 		//ListGroupMember = await groupmemberService.GetGroupAsync();
@@ -129,10 +162,12 @@ else
 		eleuser.GroupID = 0;
 		var a = new User().ToTable(eleuser); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
 		userService.EditUser(a); //บันทึกข้อมูล
-		ListUser.Remove(eleuser);
+		ListUsers.Remove(eleuser);
+		ShowNotificationDeleteMember();
 	}
 	private void CountPeople()
 	{
+
 		AmountPeople++;
 	}
 
@@ -140,7 +175,7 @@ else
 	{
 		foreach (var SelectedUsers in SelectedUser)
 		{
-			ListUser.Add(SelectedUsers);
+			ListUsers.Add(SelectedUsers);
 			SelectedUsers.GroupID = GetCurrentGroupIDPage;
 
 			var a = new User().ToTable(SelectedUsers); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
@@ -149,6 +184,18 @@ else
 		}
 
 	}
-
+	private void ShowNotificationDeleteMember()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Error,
+				Summary = "สมาชิกถูกลบแล้ว",
+				Detail = "",
+				Duration = 2700,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
 }
 

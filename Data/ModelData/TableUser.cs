@@ -14,7 +14,7 @@ namespace CW_ordermedicine.Data.DataModel
 		public string? Password { get; set; }
 		public string? Tel { get; set; }
 		public string? Department { get; set; }
-
+		public string? Level { get; set; }
 		public int GroupID { get; set; }
 		public int UserImgid { get; set; }
 		public string? UserImgName { get; set; }

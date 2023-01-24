@@ -4,7 +4,7 @@
 @inject GroupMemberService groupMemberService
 @inject UserService userService
 @inject NavigationManager NavigationManager
-
+@inject NotificationService notificationservice
 <div class="container border-card">
 	<div class="row">
 		<div class="card-header" style=" color:#ffffff; background: linear-gradient( 90deg,#8BD2EC,#92CEA8, #FCEE9E,#FFF3D7);">
@@ -117,7 +117,7 @@
 		ListGroupMember.Remove(elegroup); //ลบกลุ่มUI
 		var DeleteGroupMember = new GroupMember().ToTable(elegroup);//ลบกลุ่มในSQL
 		groupMemberService.DeleteGroupMember(DeleteGroupMember);
-
+		ShowNotificationDelete();
 	}
 	private Task OnAddGroup(GroupMember id)
 	{
@@ -133,5 +133,17 @@
 	{
 		NavigationManager.NavigateTo($"/list-group/{GroupInMemberID}");
 	}
-
+	private void ShowNotificationDelete()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Success,
+				Summary = "กลุ่มถูกลบเรียบร้อยแล้ว",
+				Detail = "",
+				Duration = 2700,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
 }

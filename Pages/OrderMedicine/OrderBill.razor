@@ -91,12 +91,12 @@
 					<div class="row">
 
 						<div class="col " style="text-align:center;">
-							<button class="btn btn-success" @onclick="OnChangeStatusToSuccess">
+							<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalSuccess">
 								ยืนยันคำสั่งซื้อ
 							</button>
 						</div>
 
-						<div class="col " style="text-align:center;" @onclick="OnChangeStatusToCancel">
+						<div class="col " style="text-align:center;" data-bs-toggle="modal" data-bs-target="#ModalCancel">
 							<button class="btn btn-danger">
 								ยกลเลิกคำสั่งซื้อ
 							</button>
@@ -198,7 +198,46 @@
 		}
 	}
 }
-
+<!-- Button trigger modal -->
+@*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+	Launch demo modal
+</button>
+*@
+<!-- Modal -->
+<div class="modal fade" id="ModalSuccess" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="exampleModalLabel">ยืนยันสถานะ Success</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				คุณต้องการยืนยันสถานะคำสั่งซื้อใช่ หรือไม่ ?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+				<button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="OnChangeStatusToSuccess">ยืนยัน</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="ModalCancel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="exampleModalLabel">ยืนยันสถานะ Cancel</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				คุณต้องการยืนยันสถานะคำสั่งซื้อใช่ หรือไม่ ?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+				<button type="button" class="btn btn-success"data-bs-dismiss="modal"  @onclick="OnChangeStatusToCancel">ยืนยัน</button>
+			</div>
+		</div>
+	</div>
+</div>
 @code {
 
 	[Parameter]
@@ -297,7 +336,7 @@
 			}
 		}
 
-		OnGoPageToReport();
+		
 	}
 	private void OnChangeStatusToCancel()
 	{

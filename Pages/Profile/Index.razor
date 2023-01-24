@@ -7,7 +7,7 @@
 @inject LoginService loginService
 @inject UserService userService
 @inject ImgService imgService
-
+@inject NotificationService notificationservice
 @page "/Profile"
 <div class="card mb-2" style="">
 	<div class="card-header" style="">รายละเอียดผู้ใช้งาน</div>
@@ -229,7 +229,7 @@
 			User.UserPath = CurrentPathImg;
 			var a = new User().ToTable(User); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
 			userService.EditUser(a); //บันทึกข้อมูล
-
+			ShowNotificationSuccessEdit();
 
 		}
 		UserLogin.Department = UserLogin.Department;
@@ -237,5 +237,17 @@
 		UserLogin.Password = UserLogin.Password;
 	}
 
-
+	private void ShowNotificationSuccessEdit()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Success,
+				Summary = "แก้ไขสำเร็จ",
+				Detail = "",
+				Duration = 2700,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
 }

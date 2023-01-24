@@ -12,7 +12,7 @@ namespace CW_ordermedicine.Data.Models
 		public string? Password { get; set; }
 		public string? Tel { get; set; }
 		public string? Department { get; set; }
-
+		public string? Level { get; set; }
 		public int GroupID { get; set; }
 
 		public int UserImgid { get; set; }
@@ -31,6 +31,7 @@ namespace CW_ordermedicine.Data.Models
 				Name = tableUser.Name,
 				Tel= tableUser.Tel,
 				Department = tableUser.Department,
+				Level = tableUser.Level,
 				GroupID = tableUser.GroupID,
 				UserImgid = tableUser.UserImgid,
 				UserImgName = tableUser.UserImgName,
@@ -50,6 +51,7 @@ namespace CW_ordermedicine.Data.Models
 				Name = NewUser.Name,
 				Tel = NewUser.Tel,
 				Department = NewUser.Department,
+				Level = NewUser.Level,
 				GroupID = NewUser.GroupID,
 				UserImgid = NewUser.UserImgid,
 				UserImgName = NewUser.UserImgName,
