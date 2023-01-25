@@ -9,7 +9,7 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header head_green">
-				<h5 class="modal-title" id="staticBackdropLabel">Create group</h5>
+				<h5 class="modal-title" id="staticBackdropLabel">สร้างกลุ่ม</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
@@ -23,7 +23,7 @@
 
 
 								<div class="form-group mt-2">
-									<label for="productname">Group name</label>
+									<label for="productname">ชื่อกลุ่ม</label>
 									<InputText @bind-Value="Group.GroupName" type="text" class="form-control mt-2" placeholder=" " />
 									<ValidationMessage For="(()=>Group.GroupName)"></ValidationMessage>
 								</div>
@@ -49,9 +49,8 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-success" click="onSave" @onclick="OnClickAddGroup">Create</button>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+				<button type="button" class="btn btn-success" click="onSave" @onclick="OnClickAddGroup">ยืนยัน</button>
 			</div>
 
 

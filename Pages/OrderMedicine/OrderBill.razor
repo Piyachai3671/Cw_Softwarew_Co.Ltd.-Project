@@ -212,7 +212,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				คุณต้องการยืนยันสถานะคำสั่งซื้อใช่ หรือไม่ ?
+				คุณต้องการ "ยืนยัน" สถานะคำสั่งซื้อใช่ หรือไม่ ?
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
@@ -221,6 +221,7 @@
 		</div>
 	</div>
 </div>
+@*//Modalยกเลิก*@
 <div class="modal fade" id="ModalCancel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -229,7 +230,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				คุณต้องการยืนยันสถานะคำสั่งซื้อใช่ หรือไม่ ?
+				คุณต้องการ "ยกเลิก" สถานะคำสั่งซื้อใช่ หรือไม่ ?
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
@@ -239,7 +240,6 @@
 	</div>
 </div>
 @code {
-
 	[Parameter]
 	public int GetOrderIDPage { get; set; }
 
@@ -303,25 +303,6 @@
 				Order.OrderStatus = "Success";
 				var a = new Order().ToTable(Order); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
 				orderService.EditOrder(a); //บันทึกข้อมูล
-
-				//var CountOrder = ListOrders.Count();
-				//AddReport = new Report()
-				//	{
-
-				//		ReportUserID = FindUerID.UserID,
-				//		ReportUserName = FindUerID.Name,
-
-				//		ReportGroupID = FindUerID.GroupID,
-				//		ReportDepartment = FindUerID.Department,
-				//		ReportOrderID = CountOrder + 1,
-				//		ReportOrderItemID = CountOrder + 1,
-				//		ReportDate = DateTime.Now,
-				//		ReportStatus = "Success",
-
-				//		ReportPriceSum = Order.OrderSumPrice,
-				//	};
-				//var AddReport2 = new Report().ToTable(AddReport);
-				//reportService.AddNewReport(AddReport2); //บันทึกข้อมูล
 			}
 			@foreach (var Report in ListReports)
 			{

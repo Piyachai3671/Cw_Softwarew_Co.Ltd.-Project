@@ -28,44 +28,69 @@ else
 				<strong class="col">ราคารวม</strong>
 				<div class="col-lg-1"></div>
 			</div>
-			@foreach (var IndexCartProduct in Items)
+			@foreach (var IndexCartProduct in ListCartProduct)
 			{
-				<div class="row mt-2" style="text-align:center;">
+				@foreach (var IndexProduct in ListProduct.FindAll(e => e.IDProduct == IndexCartProduct.IDProduct))
+				{
 
-					<div class="col-lg-3 ">
-						@IndexCartProduct.Item1.NameProduct
+					<div class="row mt-2" style="text-align:center;">
+
+						<div class="col-lg-3 ">
+							@IndexCartProduct.NameProduct
+						</div>
+						<div class="col ">
+							@IndexCartProduct.PriceProduct บาท
+						</div>
+
+						<div class="col">
+							จำนวน : @IndexProduct.RemainderProduct @IndexCartProduct.UnitProduct
+						</div>
+
+						<div class="col d-inline-flex">
+							<buttonn class="btn btn-secondary" @onclick="()=>OnReduceAmount(IndexCartProduct.Cartid)">-</buttonn>
+							<input class="form-control @(true ? "red":"blue")" type="number" @bind="@IndexCartProduct.AmountProduct"
+					   style="width:60px" max="@IndexProduct.RemainderProduct" min="1">
+							<buttonn class="btn btn-secondary" @onclick="()=>OnAddAmount(IndexCartProduct.Cartid)">+</buttonn>
+						</div>
+
+						<div class="col">
+							@{
+								SumPrice = IndexCartProduct.PriceProduct * IndexCartProduct.AmountProduct;
+							}
+							@SumPrice บาท
+						</div>
+
+
+						<div class="col-lg-1" style="text-align:end;">
+							<button class="btn btn-danger" @onclick="()=>SentValue(IndexCartProduct)" data-bs-toggle="modal" data-bs-target="#ModalDelete"><i class="fa-solid fa-trash-can"></i></button>
+						</div>
 					</div>
-					<div class="col ">
-						@IndexCartProduct.Item1.PriceProduct บาท
+					//Modal ลบสินค้า
+					<div class="modal fade" id="ModalDelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="exampleModalLabel"><i class="fa-sharp fa-solid fa-circle-check text-success"></i> กรุณายืนยันคำสั่ง</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<div class="" style="text-align:center;">
+										คุณต้องการที่จะลบกลุ่ม @ValueCartProduct.NameProduct ใช่ หรือ ไม่ ?
+									</div>
+
+
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+									<button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="()=>OnDeleteCartProduct2(ValueCartProduct)">ยืนยัน</button>
+								</div>
+							</div>
+						</div>
 					</div>
 
-					<div class="col">
-						จำนวน : @IndexCartProduct.Item2 @IndexCartProduct.Item1.UnitProduct
-					</div>
-
-					<div class="col d-inline-flex">
-						<buttonn class="btn btn-secondary" @onclick="()=>OnReduceAmount(IndexCartProduct.Item1.Cartid)">-</buttonn>
-						<input class="form-control @(true ? "red":"blue")" type="number" @bind="@IndexCartProduct.Item1.AmountProduct"
-					   style="width:60px" max="@IndexCartProduct.Item2" min="1">
-						<buttonn class="btn btn-secondary" @onclick="()=>OnAddAmount(IndexCartProduct.Item1.Cartid)">+</buttonn>
-					</div>
-
-					<div class="col">
-						@{
-							SumPrice = IndexCartProduct.Item1.PriceProduct * IndexCartProduct.Item1.AmountProduct;
-						}
-						@SumPrice บาท
-					</div>
-
-					
-					<div class="col-lg-1" style="text-align:end;">
-						<button class="btn btn-danger" @onclick="@(() =>OnDeleteCartProduct(IndexCartProduct))"><i class="fa-solid fa-trash-can"></i></button>
-					</div>
-				</div>
-
-
-
+				}
 			}
+
 
 
 
@@ -75,7 +100,6 @@ else
 			<div class="col">
 
 				<div class="me-5">Total : @SumTotal บาท</div>
-
 				<RadzenButton Text="ชำระเงิน" ButtonStyle="ButtonStyle.Success" Style="font-size:18px;margin-bottom:10px;"
 						  Click="@OnSubmit" />
 			</div>
@@ -90,8 +114,8 @@ else
 {
 	<div class="ErrorShowout bg-black bg-opacity-50 d-flex justify-content-center " style="position:absolute;z-index:1;">
 		@*<div style="position:absolute; left:67%; top:3%;">
-			<i @onclick="OnCloseShowError" class="fa-solid fa-circle-xmark" style="font-size:30px;color:orangered;cursor:pointer"></i>  <!--ปุ่มปิดกากบาท-->
-		</div>*@
+	<i @onclick="OnCloseShowError" class="fa-solid fa-circle-xmark" style="font-size:30px;color:orangered;cursor:pointer"></i>  <!--ปุ่มปิดกากบาท-->
+	</div>*@
 		<div class="row mb-2 d-inline-flex justify-content-end position-relative" style="bottom:-2%;left:80%;">
 		</div>
 		<div class="bg-white ErrorShowin" style="position:relative; top:70px;">
@@ -103,7 +127,7 @@ else
 							สินค้า "@GetName" เกินกำหนดระบบปรับเป็นจำนวนมากสุด และกรุณาทำรายการใหม่อีกครั้ง
 						</div>
 					</div>
-					
+
 
 				</div>
 				<div class="card-footer" style="margin-top:45px;">
@@ -135,7 +159,7 @@ else
 	private Order AddOrder = new();
 	private OrderItem AddOrderItem = new();
 	private Report AddReport = new();
-
+	private CartProduct? ValueCartProduct = new();
 
 	/*[Parameter]
 	public EventCallback<List<CartProduct>> OnSubmitSelectedProduct { get; set; }*/
@@ -183,11 +207,11 @@ else
 		}
 
 
-		var i = from c in ListCartProduct
-				join p in ListProduct
-				on c.Cartid equals p.IDProduct
-				select (new Tuple<CartProduct, int>(c, (p.RemainderProduct ?? 0)));
-		Items = i.ToList();
+		//var i = from c in ListCartProduct
+		//		join p in ListProduct
+		//		on c.Cartid equals p.IDProduct
+		//		select (new Tuple<CartProduct, int>(c, (p.RemainderProduct ?? 0)));
+		//Items = i.ToList();
 		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
 	}
 
@@ -228,10 +252,20 @@ else
 			SumTotal = SumTotal + ((c.AmountProduct * c.PriceProduct) ?? 0.0);
 		}
 	}
-	private void OnDeleteCartProduct(Tuple<CartProduct, int> c)
+	private void SentValue(CartProduct ID)
 	{
-		Items.Remove(c);
-		ListCartProduct.Remove(c.Item1);
+		ValueCartProduct = ID;
+	}
+	//private async Task  OnDeleteCartProduct(Tuple<CartProduct, int> c)
+	//{
+	//	Items.Remove(c);
+	//	//ListCartProduct.Remove(c.Item1);
+	//	OnDeleteCartProduct2(c.Item1);
+	//	Calculate();
+	//}
+	private async Task OnDeleteCartProduct2(CartProduct c)
+	{
+		ListCartProduct.Remove(c);
 		Calculate();
 	}
 
@@ -244,17 +278,31 @@ else
 	private bool CheckConfirm = false;
 	private void OnSubmit()
 	{
-		foreach (var a in Items)
+		@foreach (var IndexCartProduct in ListCartProduct)
 		{
-			if (a.Item1.AmountProduct == 0)
-			{ }
-			if (a.Item1.AmountProduct > a.Item2)
+			@foreach (var IndexProduct in ListProduct.FindAll(e => e.IDProduct == IndexCartProduct.IDProduct))
 			{
-				a.Item1.AmountProduct = a.Item2;
-				ShowError(a.Item1.NameProduct);
-				return;
+				if (IndexCartProduct.AmountProduct == 0)
+				{ }
+				if (IndexCartProduct.AmountProduct > IndexProduct.RemainderProduct)
+				{
+					IndexCartProduct.AmountProduct = IndexProduct.RemainderProduct;
+					ShowError(IndexCartProduct.NameProduct);
+					return;
+				}
 			}
 		}
+		//foreach (var a in Items)
+		//{
+		//	if (a.Item1.AmountProduct == 0)
+		//	{ }
+		//	if (a.Item1.AmountProduct > a.Item2)
+		//	{
+		//		a.Item1.AmountProduct = a.Item2;
+		//		ShowError(a.Item1.NameProduct);
+		//		return;
+		//	}
+		//}
 		CheckConfirm = true;
 		if (CheckConfirm == true)
 		{
@@ -332,8 +380,6 @@ else
 
 	bool showModal = false;
 
-	//void ModalShow() => showModal = true;
-
 	void ModalCancel() => showModal = false;
 
 	void ModalOk()
@@ -355,18 +401,19 @@ else
 			};
 		notificationservice.Notify(a);
 	}
-	private string GetName ="";
+	private string GetName = "";
 	private bool IsShowError = false;
 	private void ShowError(string name)
 	{
 		IsShowError = !IsShowError;
-		 GetName = name;
+		GetName = name;
 		Console.WriteLine(GetName);
 	}
 	public void OnCloseShowError()
 	{
 		IsShowError = !IsShowError;
 	}
+
 }
 
 

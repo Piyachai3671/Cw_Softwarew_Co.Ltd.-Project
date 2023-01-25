@@ -53,21 +53,25 @@
 								<div style="font-size:20px;position:relative; left:270px; top:-100px;">
 									@if (UserLogin.Level == "admin")
 									{
-										<i class="fa-solid fa-trash bincolor" @onclick="()=>SentValue(Group)"  data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
-
-										<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+										<i class="fa-solid fa-trash bincolor" @onclick="()=>SentValue(Group)" data-bs-toggle="modal" data-bs-target="#ModalDelete"></i>
+										//	Modalยืนยันลบกลุ่ม
+										<div class="modal fade" id="ModalDelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog">
 												<div class="modal-content">
 													<div class="modal-header">
-														<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+														<h5 class="modal-title" id="exampleModalLabel"><i class="fa-sharp fa-solid fa-circle-check text-success"></i> กรุณายืนยันคำสั่ง</h5>
 														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 													</div>
 													<div class="modal-body">
-														...
+														<div class="" style="text-align:center;">
+															คุณต้องการที่จะลบกลุ่ม @ValueGroup.GroupName ใช่ หรือ ไม่ ?
+														</div>
+
+
 													</div>
 													<div class="modal-footer">
-														<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-														<button type="button" class="btn btn-primary" @onclick="()=>OnDeleteGroup(IDGroup)">Save changes</button>
+														<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+														<button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="()=>OnDeleteGroup(ValueGroup)">ยืนยัน</button>
 													</div>
 												</div>
 											</div>
@@ -78,12 +82,24 @@
 										<i class="fa-solid fa-trash bincolor" @onclick="ShowNotificationDelete"></i>
 
 									}
-									
+
 								</div>
 
-								<div class="row" style="margin-top:80px; margin-left:220px;">
-									<div class="">
-										<button class="btn btn-success me-1" style="border-radius:10px; font-size:25px;" data-bs-toggle="modal" data-bs-target="#FromAddMember" @onclick="()=>OpenGroupInMemberPage(Group.GroupID)">
+								<div class="row" style="margin-top:80px; margin-left:170px;">
+									<div class="col d-inline-flex">
+										@if (UserLogin.Level == "admin")
+										{
+											<button class="btn btn-warning me-2" style="border-radius:10px; font-size:25px;" data-bs-toggle="modal" data-bs-target="#ModalEdit" @onclick="()=>SentValue(Group)">
+												<i class="fa-sharp fa-solid fa-pen-to-square" style="font-size:25px; color:white;"></i>
+											</button>
+										}
+										else
+										{
+											<button class="btn btn-warning me-2" style="border-radius:10px; font-size:25px;" @onclick="ShowNotificationDelete">
+												<i class="fa-sharp fa-solid fa-pen-to-square" style="font-size:25px; color:white;"></i>
+											</button>
+										}
+										<button class="btn btn-success " style="border-radius:10px; font-size:25px;" data-bs-toggle="modal" data-bs-target="#FromAddMember" @onclick="()=>OpenGroupInMemberPage(Group.GroupID)">
 											<i class="fa-solid fa-user-plus" style="font-size:19px;"></i>
 										</button>
 									</div>
@@ -101,7 +117,38 @@
 
 </div>
 
+<div class="modal fade" id="ModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">แก้ไขกลุ่ม @ValueGroup.GroupName</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<EditForm Model="@ValueGroup">
+					<div class="form-group mt-2">
+						<label for="productname">ชื่อกลุ่ม</label>
+						<InputText @bind-Value="ValueGroup.GroupName" type="text" class="form-control mt-2" placeholder=" " />
 
+					</div>
+					<label class="mt-2">
+						แผนก:
+						<InputSelect @bind-Value="ValueGroup.Department">
+							<option value="">เลือกแผนก</option>
+							<option value="Software">Software</option>
+							<option value="Account">Account</option>
+							<option value="Maid">Maid</option>
+						</InputSelect>
+					</label>
+				</EditForm>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+				<button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="OnClickEditGroup">บันทึก</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 <FromAddGroup GetAddGroupID="OnAddGroup"></FromAddGroup>
 
@@ -111,6 +158,7 @@
 	private List<User> ListUser = new List<User>();
 	private User? ResetGroupID;
 	private User? UserLogin = new();
+	private GroupMember? ValueGroup = new();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -126,39 +174,19 @@
 		foreach (var user in Users)
 		{
 			ListUser.Add(new User().ToUi(user));
-			//ListUser.Add(new User
-			//	{
-			//		UserID = user.UserID,
-			//		Username = user.Name,
-			//		Name = user.Name,
-			//		Department = user.Department,
-			//		Password = user.Password,
-			//		GroupID = user.GroupID
-			//	});
-
 		}
 		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
 
 	}
-	private GroupMember IDGroup;
-	private void SentValue(GroupMember ID)
+	private void SentValue(GroupMember? ID)
 	{
-		IDGroup = ID;
-		OnDeleteGroup(ID);
+		ValueGroup = ID;
 	}
-	private void OnDeleteGroup(GroupMember elegroup)
+	private async Task OnDeleteGroup(GroupMember elegroup)
 	{
-		//@foreach (var ListUsers in ListUser)
-		//{
-		//	@if (ListUsers.GroupID == elegroup.GroupID)
-		//	{
-		//		ListUsers.GroupID = 0;
-		//	}
-
-		//}
 		ListGroupMember.Remove(elegroup); //ลบกลุ่มUI
 		var DeleteGroupMember = new GroupMember().ToTable(elegroup);//ลบกลุ่มในSQL
-		//groupMemberService.DeleteGroupMember(DeleteGroupMember);
+		groupMemberService.DeleteGroupMember(DeleteGroupMember);
 		ShowNotificationDeleteForAdmin();
 	}
 	private Task OnAddGroup(GroupMember id)
@@ -180,7 +208,7 @@
 		var a = new NotificationMessage
 			{
 				Severity = NotificationSeverity.Success,
-				Summary = "กลุ่มถูกลบเรียบร้อยแล้ว",
+				Summary = "กลุ่ม " + ValueGroup.GroupName + " ถูกลบเรียบร้อยแล้ว",
 				Detail = "",
 				Duration = 2700,
 				CloseOnClick = true,
@@ -200,5 +228,35 @@
 				Payload = DateTime.Now
 			};
 		notificationservice.Notify(a);
+	}
+	private void ShowNotificationSuccessEdit()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Success,
+				Summary = "แก้ไขสำเร็จ",
+				Detail = "",
+				Duration = 2700,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
+
+	private void OnClickEditGroup()
+	{
+		@foreach (var Group in ListGroupMember.FindAll(e => e.GroupID == ValueGroup.GroupID))
+		{
+			Group.GroupName = ValueGroup.GroupName;
+			Group.Department = ValueGroup.Department;
+
+			var a = new GroupMember().ToTable(Group); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+			groupMemberService.EditGroup(a); //บันทึกข้อมูล
+			ShowNotificationSuccessEdit();
+
+		}
+		UserLogin.Department = UserLogin.Department;
+		UserLogin.Tel = UserLogin.Tel;
+		UserLogin.Password = UserLogin.Password;
 	}
 }
