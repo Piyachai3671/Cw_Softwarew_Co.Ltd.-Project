@@ -37,6 +37,8 @@ namespace CW_ordermedicine.Data.Services
 		{
 			var FindID = _Context.TableOrder.First(e => e.OrderID == EditOrder.OrderID);
 			FindID.OrderDateCreate = EditOrder.OrderDateCreate;
+			FindID.OrderDateSuccess = EditOrder.OrderDateSuccess;
+			FindID.OrderDateCancel = EditOrder.OrderDateCancel;
 			FindID.OrderStatus = EditOrder.OrderStatus;
 
 		

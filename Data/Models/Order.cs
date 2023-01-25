@@ -9,6 +9,8 @@ namespace CW_ordermedicine.Data.Models
 		public int OrderID { get; set; }
 		public double OrderSumPrice { get; set; }
 		public DateTime OrderDateCreate { get; set; }
+		public DateTime? OrderDateSuccess { get; set; }
+		public DateTime? OrderDateCancel { get; set; }
 		public string? OrderStatus { get; set; }
 
 		/// <summary>
@@ -21,21 +23,6 @@ namespace CW_ordermedicine.Data.Models
 
 		public int OrderGroupID { get; set; }
 
-		/// <summary>
-		/// /////////////////////////////////////////////
-		/// </summary>
-
-		////เป็นการสร้าง Order ขึ้นมาเพื่อไม่ให้มันซ้ำกันเวลา ClearList ในตระกล้า
-		//public int Cartid { get; set; }
-		//public List<CartProduct> carts { get; set; }
-		////public Order(List<CartProduct> carts)
-		////{
-		////	this.carts = new();
-		////	carts.ForEach(i => this.carts.Add(i));
-		////	//this.OrderPrice = this.carts.Sum(i =>i.PriceProduct * i.AmountProduct)??0.0;
-
-		////}
-
 		public Order()
 		{ }
 		public Order ToUi(TableOrder tableOrder) //UI ไปเทเบิล
@@ -46,6 +33,8 @@ namespace CW_ordermedicine.Data.Models
 				OrderID = tableOrder.OrderID,
 				OrderSumPrice = tableOrder.OrderSumPrice,
 				OrderDateCreate = tableOrder.OrderDateCreate,
+				OrderDateSuccess = tableOrder.OrderDateSuccess,
+				OrderDateCancel = tableOrder.OrderDateCancel,
 				OrderStatus = tableOrder.OrderStatus,
 				//ส่วนของรายละเอียดผู้ซื้อ
 				OrderUserID = tableOrder.OrderUserID,
@@ -62,6 +51,8 @@ namespace CW_ordermedicine.Data.Models
 				OrderID = NewOrder.OrderID,
 				OrderSumPrice = NewOrder.OrderSumPrice,
 				OrderDateCreate = NewOrder.OrderDateCreate,
+				OrderDateSuccess = NewOrder.OrderDateSuccess,
+				OrderDateCancel = NewOrder.OrderDateCancel,
 				OrderStatus = NewOrder.OrderStatus,
 				//ส่วนของรายละเอียดผู้ซื้อ
 				OrderUserID = NewOrder.OrderUserID,

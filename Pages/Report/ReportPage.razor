@@ -18,9 +18,9 @@
 		{
 			<RadzenDataGrid FilterMode="FilterMode.SimpleWithMenu"
 						AllowFiltering="true" AllowPaging="true" AllowSorting="true" AllowColumnResize="true"
-						PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
+						PageSize="10" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
 						FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-						LogicalFilterOperator="LogicalFilterOperator.Or">
+						LogicalFilterOperator="LogicalFilterOperator.Or" Style="z-index:0">
 
 				<Columns>
 					<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center">

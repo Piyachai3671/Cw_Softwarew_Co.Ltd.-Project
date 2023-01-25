@@ -42,11 +42,11 @@ else
 		<thead>
 			<tr>
 				<th scope="col">#</th>
-				<th scope="col">Img</th>
+				<th scope="col">ภาพ</th>
 
-				<th scope="col">Name Lastname</th>
-				<th scope="col">Department</th>
-				<th scope="col">Edit member</th>
+				<th scope="col">ชื่อ - นามสกุล</th>
+				<th scope="col">แผนก</th>
+				<th scope="col"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -72,13 +72,13 @@ else
 							@if (UserLogin.Level == "admin")
 							{
 								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>OnDeleteMember(ListUsers[tempint])">
-									Delete Member
+									ลบสมาชิก
 								</div>
 							}
 							else
 							{
 								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="ShowNotificationAlert">
-									Delete Member
+									ลบสมาชิก
 								</div>
 							}
 						</td>

@@ -11,7 +11,7 @@
 
 @foreach (var Order in ListOrders)
 {
-	@if (Order.OrderID == GetOrderIDPage)
+	@if (Order.OrderID == GetOrderIDPage && Order.OrderStatus == "PreOrder")
 	{
 		<div class="card mb-2" style="">
 			<div class="card-header" style="">รายละเอียดประวัติผู้ทำรายการ</div>
@@ -67,6 +67,7 @@
 
 
 
+
 		@if (Order.OrderStatus == "PreOrder" && Order.OrderID == GetOrderIDPage)
 		{
 			<div class="card mt-3">
@@ -75,15 +76,18 @@
 				</div>
 				<div class="card-body">
 					<div class="row">
-						<div class="col-lg-1">
-							<label>วันที่สั่งสินค้า : </label>
+						<div class="d-inline-flex">
+							<div class="col-lg-1">
+								<label>วันที่สั่งสินค้า : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateCreate</label>
+							</div>
 						</div>
-						<div class="col">
-							<label>@Order.OrderDateCreate</label>
-						</div>
-
 					</div>
+
 					<div class="row">
+
 						<div class="col">
 							@Order.OrderID
 						</div>
@@ -115,11 +119,76 @@
 				</div>
 				<div class="card-body">
 					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่ทำรายการ : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateCreate</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่เสร็จสิ้นคำสั่งซื้อ : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateSuccess</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
 						<div class="col-lg-2">
-							<label>วันที่ทำรายการ : </label>
+							<label>รหัสคำสั่งซื้อ : </label>
 						</div>
 						<div class="col">
-							<label>@Order.OrderDateCreate</label>
+							@Order.OrderID
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน A4
+							</button>
+						</div>
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน 9x11
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+
+		@if (Order.OrderStatus == "Cancel" && Order.OrderID == GetOrderIDPage)
+		{
+			<div class="card mt-3">
+				<div class="card-header ">
+					รายละเอียดสถานะคำสั่งซื้อ
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่ทำรายการ : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateCreate</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่สิ้นสุดคำสั่งซื้อ : </label>
+							</div>
+							<div class="">
+								<label>@Order.OrderDateCancel</label>
+							</div>
 						</div>
 
 					</div>
@@ -156,7 +225,7 @@
 				<table class="table table-bordered">
 					<thead>
 						<tr>
-							<th scope="col">ที่</th>
+							<th scope="col">รหัสสินค้า</th>
 							<th scope="col">สินค้า</th>
 
 							<th scope="col">จำนวน</th>
@@ -172,7 +241,7 @@
 							@if (Order.OrderID == OrderItem.OrderItemOrderID)
 							{
 								<tr>
-									<th scope="row"></th>
+									<th> @OrderItem.OrderItemProductID</th>
 									<td>@OrderItem.OrderItemProductName </td>
 									<td>@OrderItem.OrderItemProductAmount</td>
 									<td>@OrderItem.OrderItemProductPrice</td>
@@ -197,13 +266,521 @@
 			</div>
 		}
 	}
+
+	@if (Order.OrderID == GetOrderIDPage && Order.OrderStatus == "Success")
+	{
+		<div class="card mb-2" style="">
+			<div class="card-header" style="">รายละเอียดประวัติผู้ทำรายการ</div>
+
+			<div class="card-body" style="background-color:lightgreen ;">
+
+				<div class="row" style="">
+					<div class="row mt-2">
+						<div class="col-lg-1">
+							<label>ชื่อ :  </label>
+						</div>
+						<div class="col d-inline-flex">
+							@Order.OrderUsername
+						</div>
+					</div>
+
+					<div class="row mt-2">
+						<div class="col">
+							<div class="row">
+								<div class="col-lg-3">
+									<label>แผนก :  </label>
+								</div>
+								<div class="col">
+									@Order.OrderDepartment
+								</div>
+							</div>
+						</div>
+						<div class="col mb-2">
+							<div class="row">
+								<div class="col-lg-3">
+									<label>กลุ่ม :</label>
+								</div>
+								<div class="col">
+									@Order.OrderGroupID
+								</div>
+							</div>
+						</div>
+
+						<div class="col mb-2">
+							<div class="row">
+								<div class="col-lg-3">
+									<label>เบอร์โทร :</label>
+								</div>
+								<div class="col">
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+
+		@if (Order.OrderStatus == "PreOrder" && Order.OrderID == GetOrderIDPage)
+		{
+			<div class="card mt-3">
+				<div class="card-header ">
+					จัดการสถานะคำสั่งซื้อ
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-1">
+								<label>วันที่สั่งสินค้า : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateCreate</label>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+
+						<div class="col">
+							@Order.OrderID
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalSuccess">
+								ยืนยันคำสั่งซื้อ
+							</button>
+						</div>
+
+						<div class="col " style="text-align:center;" data-bs-toggle="modal" data-bs-target="#ModalCancel">
+							<button class="btn btn-danger">
+								ยกลเลิกคำสั่งซื้อ
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		}
+
+		@if (Order.OrderStatus == "Success" && Order.OrderID == GetOrderIDPage)
+		{
+			<div class="card mt-3">
+				<div class="card-header ">
+					จัดการสถานะคำสั่งซื้อ
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่ทำรายการ : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateCreate</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่เสร็จสิ้นคำสั่งซื้อ : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateSuccess</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-2">
+							<label>รหัสคำสั่งซื้อ : </label>
+						</div>
+						<div class="col">
+							@Order.OrderID
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน A4
+							</button>
+						</div>
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน 9x11
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+
+		@if (Order.OrderStatus == "Cancel" && Order.OrderID == GetOrderIDPage)
+		{
+			<div class="card mt-3">
+				<div class="card-header ">
+					รายละเอียดสถานะคำสั่งซื้อ
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่ทำรายการ : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateCreate</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่สิ้นสุดคำสั่งซื้อ : </label>
+							</div>
+							<div class="">
+								<label>@Order.OrderDateCancel</label>
+							</div>
+						</div>
+
+					</div>
+					<div class="row">
+						<div class="col-lg-2">
+							<label>รหัสคำสั่งซื้อ : </label>
+						</div>
+						<div class="col">
+							@Order.OrderID
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน A4
+							</button>
+						</div>
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน 9x11
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+
+		@if (Order.OrderID == GetOrderIDPage)
+		{
+			<div class="container-fluid mt-3">
+
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th scope="col">รหัสสินค้า</th>
+							<th scope="col">สินค้า</th>
+
+							<th scope="col">จำนวน</th>
+							<th scope="col">ราคา/ชิ้น</th>
+							<th scope="col">ราคารวม</th>
+
+						</tr>
+					</thead>
+
+					<tbody>
+						@foreach (var OrderItem in ListOrderItems)
+						{
+							@if (Order.OrderID == OrderItem.OrderItemOrderID)
+							{
+								<tr>
+									<th> @OrderItem.OrderItemProductID</th>
+									<td>@OrderItem.OrderItemProductName </td>
+									<td>@OrderItem.OrderItemProductAmount</td>
+									<td>@OrderItem.OrderItemProductPrice</td>
+									<td>@OrderItem.OrderItemProductSumPrice</td>
+								</tr>
+							}
+
+						}
+
+					</tbody>
+					<tfoot>
+						<tr>
+							<th style="text-align:center;" colspan="4">รวม</th>
+							@if (Order.OrderID == GetOrderIDPage)
+							{
+								<th style="" colspan="1">@Order.OrderSumPrice</th>
+							}
+						</tr>
+					</tfoot>
+				</table>
+
+			</div>
+		}
+	}
+
+	@if (Order.OrderID == GetOrderIDPage && Order.OrderStatus == "Cancel")
+	{
+		<div class="card mb-2" style="">
+			<div class="card-header" style="">รายละเอียดประวัติผู้ทำรายการ</div>
+
+			<div class="card-body" style="background-color:#F96464;">
+
+				<div class="row" style="">
+					<div class="row mt-2">
+						<div class="col-lg-1">
+							<label>ชื่อ :  </label>
+						</div>
+						<div class="col d-inline-flex">
+							@Order.OrderUsername
+						</div>
+					</div>
+
+					<div class="row mt-2">
+						<div class="col">
+							<div class="row">
+								<div class="col-lg-3">
+									<label>แผนก :  </label>
+								</div>
+								<div class="col">
+									@Order.OrderDepartment
+								</div>
+							</div>
+						</div>
+						<div class="col mb-2">
+							<div class="row">
+								<div class="col-lg-3">
+									<label>กลุ่ม :</label>
+								</div>
+								<div class="col">
+									@Order.OrderGroupID
+								</div>
+							</div>
+						</div>
+
+						<div class="col mb-2">
+							<div class="row">
+								<div class="col-lg-3">
+									<label>เบอร์โทร :</label>
+								</div>
+								<div class="col">
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+
+		@if (Order.OrderStatus == "PreOrder" && Order.OrderID == GetOrderIDPage)
+		{
+			<div class="card mt-3">
+				<div class="card-header ">
+					จัดการสถานะคำสั่งซื้อ
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-1">
+								<label>วันที่สั่งสินค้า : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateCreate</label>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+
+						<div class="col">
+							@Order.OrderID
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalSuccess">
+								ยืนยันคำสั่งซื้อ
+							</button>
+						</div>
+
+						<div class="col " style="text-align:center;" data-bs-toggle="modal" data-bs-target="#ModalCancel">
+							<button class="btn btn-danger">
+								ยกลเลิกคำสั่งซื้อ
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		}
+
+		@if (Order.OrderStatus == "Success" && Order.OrderID == GetOrderIDPage)
+		{
+			<div class="card mt-3">
+				<div class="card-header ">
+					จัดการสถานะคำสั่งซื้อ
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่ทำรายการ : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateCreate</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่เสร็จสิ้นคำสั่งซื้อ : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateSuccess</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-2">
+							<label>รหัสคำสั่งซื้อ : </label>
+						</div>
+						<div class="col">
+							@Order.OrderID
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน A4
+							</button>
+						</div>
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน 9x11
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+
+		@if (Order.OrderStatus == "Cancel" && Order.OrderID == GetOrderIDPage)
+		{
+			<div class="card mt-3">
+				<div class="card-header ">
+					รายละเอียดสถานะคำสั่งซื้อ
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่ทำรายการ : </label>
+							</div>
+							<div class="col">
+								<label>@Order.OrderDateCreate</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="d-inline-flex">
+							<div class="col-lg-2">
+								<label>วันที่สิ้นสุดคำสั่งซื้อ : </label>
+							</div>
+							<div class="">
+								<label>@Order.OrderDateCancel</label>
+							</div>
+						</div>
+
+					</div>
+					<div class="row">
+						<div class="col-lg-2">
+							<label>รหัสคำสั่งซื้อ : </label>
+						</div>
+						<div class="col">
+							@Order.OrderID
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน A4
+							</button>
+						</div>
+
+						<div class="col " style="text-align:center;">
+							<button class="btn btn-primary">
+								พิมพ์รายงาน 9x11
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+
+		@if (Order.OrderID == GetOrderIDPage)
+		{
+			<div class="container-fluid mt-3">
+
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th scope="col">รหัสสินค้า</th>
+							<th scope="col">สินค้า</th>
+
+							<th scope="col">จำนวน</th>
+							<th scope="col">ราคา/ชิ้น</th>
+							<th scope="col">ราคารวม</th>
+
+						</tr>
+					</thead>
+
+					<tbody>
+						@foreach (var OrderItem in ListOrderItems)
+						{
+							@if (Order.OrderID == OrderItem.OrderItemOrderID)
+							{
+								<tr>
+									<th> @OrderItem.OrderItemProductID</th>
+									<td>@OrderItem.OrderItemProductName </td>
+									<td>@OrderItem.OrderItemProductAmount</td>
+									<td>@OrderItem.OrderItemProductPrice</td>
+									<td>@OrderItem.OrderItemProductSumPrice</td>
+								</tr>
+							}
+
+						}
+
+					</tbody>
+					<tfoot>
+						<tr>
+							<th style="text-align:center;" colspan="4">รวม</th>
+							@if (Order.OrderID == GetOrderIDPage)
+							{
+								<th style="" colspan="1">@Order.OrderSumPrice</th>
+							}
+						</tr>
+					</tfoot>
+				</table>
+
+			</div>
+		}
+	}
+
 }
-<!-- Button trigger modal -->
-@*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-	Launch demo modal
-</button>
-*@
-<!-- Modal -->
+@*//Modalยืนยัน*@
 <div class="modal fade" id="ModalSuccess" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -234,7 +811,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-				<button type="button" class="btn btn-success"data-bs-dismiss="modal"  @onclick="OnChangeStatusToCancel">ยืนยัน</button>
+				<button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="OnChangeStatusToCancel">ยืนยัน</button>
 			</div>
 		</div>
 	</div>
@@ -300,6 +877,7 @@
 		{
 			@if (Order.OrderID == GetOrderIDPage && Order.OrderStatus == "PreOrder")
 			{
+				Order.OrderDateSuccess = DateTime.Now;
 				Order.OrderStatus = "Success";
 				var a = new Order().ToTable(Order); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
 				orderService.EditOrder(a); //บันทึกข้อมูล
@@ -317,7 +895,7 @@
 			}
 		}
 
-		
+
 	}
 	private void OnChangeStatusToCancel()
 	{
@@ -325,6 +903,7 @@
 		{
 			@if (Order.OrderID == GetOrderIDPage && Order.OrderStatus == "PreOrder")
 			{
+				Order.OrderDateCancel = DateTime.Now;
 				Order.OrderStatus = "Cancel";
 				var a = new Order().ToTable(Order); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
 				orderService.EditOrder(a); //บันทึกข้อมูล

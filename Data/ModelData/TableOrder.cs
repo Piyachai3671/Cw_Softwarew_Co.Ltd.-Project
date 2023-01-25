@@ -17,6 +17,8 @@ namespace CW_ordermedicine.Data.ModelData
 		public int OrderGroupID { get; set; }
 
 		public DateTime OrderDateCreate { get; set; }
+		public DateTime? OrderDateSuccess { get; set; }
+		public DateTime? OrderDateCancel { get; set; }
 		public string OrderStatus { get; set; }
 
 	}
