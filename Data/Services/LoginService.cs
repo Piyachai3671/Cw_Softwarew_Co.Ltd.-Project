@@ -19,13 +19,11 @@ namespace CW_ordermedicine.Data.Services
 		public async Task<bool> Login(string UserName, string Password)
 		{
 			bool Status = false;
-			TableUser? Users = await UserService.SelectUser(UserName, Password); //การล็อคอินมีได้แค่1คนจึงใช้การค้นหา
-			if (Users != null)
+			TableUser Users = await UserService.SelectUser(UserName, Password); //การล็อคอินมีได้แค่1คนจึงใช้การค้นหา
+			if (Users.Username != null)
 			{
 				UserToLogin = Users;
 				Status = true;
-
-
 			}
 			return await Task.FromResult(Status);
 		}

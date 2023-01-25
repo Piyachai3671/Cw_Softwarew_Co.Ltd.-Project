@@ -6,6 +6,7 @@
 @inject GroupMemberService groupmemberService
 @inject LoginService loginService
 @inject NotificationService notificationservice
+
 <!--
 @if (adduser == null)
 {
@@ -52,15 +53,15 @@ else
 
 			@for (int i = 0; i < ListUsers.Count; i++)
 			{
-				
+
 				@if (ListUsers[i].GroupID == GetCurrentGroupIDPage)
 				{
 					var tempint = i;
 
 					@*@foreach(var User in ListUsers.FindAll(e => e.GroupID == GetCurrentGroupIDPage))
-						{*@
+			{*@
 					<tr>
-						<td>@(i+1)</td>
+						<td>@(i + 1)</td>
 						<th scope="row">
 							<img class="rounded-3" style="width:30px; height:30px;" src="img/@ListUsers[i].UserImgName">
 						</th>
@@ -68,14 +69,23 @@ else
 						<td>@ListUsers[i].Department</td>
 
 						<td>
-							<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>OnDeleteMember(ListUsers[tempint])">
-								Delete Member
-							</div>
+							@if (UserLogin.Level == "admin")
+							{
+								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>OnDeleteMember(ListUsers[tempint])">
+									Delete Member
+								</div>
+							}
+							else
+							{
+								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="ShowNotificationAlert">
+									Delete Member
+								</div>
+							}
 						</td>
 					</tr>
 				}
 			}
-			
+
 			<!--
 				<RadzenDataGrid FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
 							PageSize="10" Data="@ListUsers.Where(e=>e.GroupID == GetCurrentGroupIDPage)" TItem="User" ColumnWidth="150px">
@@ -109,9 +119,18 @@ else
 <div class="position-sticky" style=" bottom:0px; text-align:end;  ">
 	<div class="row">
 		<div class="">
-			<button class="btn btn-success shadow mt-1 mb-2" style="border-radius:50%; font-size:30px; border:none;" data-bs-toggle="modal" data-bs-target="#FromAddMember">
-				<i class="fa-solid fa-plus" style="font-size:30px;"></i>
-			</button>
+			@if (UserLogin.Level == "admin")
+			{
+				<button class="btn btn-success shadow mt-1 mb-2" style="border-radius:50%; font-size:30px; border:none;" data-bs-toggle="modal" data-bs-target="#FromAddMember">
+					<i class="fa-solid fa-plus" style="font-size:30px;"></i>
+				</button>
+			}
+			else
+			{
+				<button class="btn btn-success shadow mt-1 mb-2" style="border-radius:50%; font-size:30px; border:none;" @onclick="ShowNotificationAlert">
+					<i class="fa-solid fa-plus" style="font-size:30px;"></i>
+				</button>
+			}
 		</div>
 	</div>
 </div>
@@ -146,7 +165,7 @@ else
 		}
 
 		//ListGroupMember = await groupmemberService.GetGroupAsync();
-		//UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
 	}
 
 	private void OnDeleteMember(User eleuser)
@@ -190,6 +209,19 @@ else
 			{
 				Severity = NotificationSeverity.Error,
 				Summary = "สมาชิกถูกลบแล้ว",
+				Detail = "",
+				Duration = 2700,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
+	private void ShowNotificationAlert()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Warning,
+				Summary = "สำหรับ admin เท่านั้น !",
 				Detail = "",
 				Duration = 2700,
 				CloseOnClick = true,

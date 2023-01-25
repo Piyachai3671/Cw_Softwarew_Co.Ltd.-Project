@@ -5,6 +5,7 @@
 @inject UserService userService
 @inject LoginService loginService
 @inject NavigationManager NavigationManager
+@inject NotificationService notificationservice
 
 <PageTitle>CW_ordermedicine</PageTitle>
 <RadzenNotification></RadzenNotification>
@@ -155,7 +156,7 @@ else if (Islogin == false)
 	{
 		ListCartProduct = await cartproductService.GetCartProductsAsync();
 		var Users = await userService.GetUserAsync();
-		
+
 		CountCart();
 		Model = new User();
 
@@ -173,7 +174,15 @@ else if (Islogin == false)
 
 		bool Status = await loginService.Login(Model.Username, Model.Password);
 		Islogin = Status;
-		UserLogin =  new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+		if (Islogin == true)
+		{
+			UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+			ShowNotificationLogin();
+		}
+		else
+		{
+			ShowNotificationLoginFlase();
+		}
 	}
 
 	private  void OnLogout()
@@ -186,5 +195,30 @@ else if (Islogin == false)
 	//{
 	//	NavigationManager.NavigateTo($"/orderbill/{SentOrderIDPage}");
 	//}
-
+	private void ShowNotificationLogin()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Success,
+				Summary = "ยินดีต้อนรับเข้าสู่ระบบ",
+				Detail = UserLogin.Name,
+				Duration = 5000,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
+	private void ShowNotificationLoginFlase()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Error,
+				Summary = "รหัสไม่ถูกต้อง !",
+				Detail = "",
+				Duration = 5000,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
 } 

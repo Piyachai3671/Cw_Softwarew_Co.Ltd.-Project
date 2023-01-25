@@ -22,7 +22,7 @@ else
 		<div class="row">
 			<div class="row mb-3" style="text-align:center; background-color:aquamarine; margin-left:1px; padding:10px;">
 				<strong class="col " style="">ชื่อสินค้า</strong>
-				<strong class="col " style="">ราคา</strong>
+				<strong class="col " style="">ราคา/หน่วย</strong>
 				<strong class="col">จำนวนคงเหลือ</strong>
 				<strong class="col">จำนวนที่เลือก</strong>
 				<strong class="col">ราคารวม</strong>
@@ -36,7 +36,7 @@ else
 						@IndexCartProduct.Item1.NameProduct
 					</div>
 					<div class="col ">
-						@IndexCartProduct.Item1.PriceProduct"
+						@IndexCartProduct.Item1.PriceProduct บาท
 					</div>
 
 					<div class="col">
@@ -46,7 +46,7 @@ else
 					<div class="col d-inline-flex">
 						<buttonn class="btn btn-secondary" @onclick="()=>OnReduceAmount(IndexCartProduct.Item1.Cartid)">-</buttonn>
 						<input class="form-control @(true ? "red":"blue")" type="number" @bind="@IndexCartProduct.Item1.AmountProduct"
-					   style="width:60px" max="@IndexCartProduct.Item2">
+					   style="width:60px" max="@IndexCartProduct.Item2" min="1">
 						<buttonn class="btn btn-secondary" @onclick="()=>OnAddAmount(IndexCartProduct.Item1.Cartid)">+</buttonn>
 					</div>
 
@@ -57,11 +57,14 @@ else
 						@SumPrice บาท
 					</div>
 
-
+					
 					<div class="col-lg-1" style="text-align:end;">
 						<button class="btn btn-danger" @onclick="@(() =>OnDeleteCartProduct(IndexCartProduct))"><i class="fa-solid fa-trash-can"></i></button>
 					</div>
 				</div>
+
+
+
 			}
 
 
@@ -82,21 +85,28 @@ else
 	</div>
 
 }
+
 @if (IsShowError == true)
 {
 	<div class="ErrorShowout bg-black bg-opacity-50 d-flex justify-content-center " style="position:absolute;z-index:1;">
-		<div style="position:absolute; left:85%; top:5%;">
+		@*<div style="position:absolute; left:67%; top:3%;">
 			<i @onclick="OnCloseShowError" class="fa-solid fa-circle-xmark" style="font-size:30px;color:orangered;cursor:pointer"></i>  <!--ปุ่มปิดกากบาท-->
-		</div>
+		</div>*@
 		<div class="row mb-2 d-inline-flex justify-content-end position-relative" style="bottom:-2%;left:80%;">
 		</div>
 		<div class="bg-white ErrorShowin" style="position:relative; top:70px;">
 			<div class="card">
-				<div class="card-header">แจ้งเตืออน</div>
+				<div class="card-header"><i class="fa-solid fa-circle-exclamation text-danger"></i> แจ้งเตือน</div>
 				<div class="card-body d-flex justify-content-center align-items-center " style="position:relative;top:30px;">
-					มีการเลือกจำนวนสินค้าเกินกว่ากำหนด กรุณาทำรายการอีกครั้ง
+					<div class="row">
+						<div class="col" style="text-align:center;">
+							สินค้า "@GetName" เกินกำหนดระบบปรับเป็นจำนวนมากสุด และกรุณาทำรายการใหม่อีกครั้ง
+						</div>
+					</div>
+					
+
 				</div>
-				<div class="card-footer" style="position:relative;top:60px;">
+				<div class="card-footer" style="margin-top:45px;">
 					<div class="" style="text-align:end; ">
 						<button class="btn btn-primary" @onclick="OnCloseShowError">
 							ตกลง
@@ -107,7 +117,6 @@ else
 		</div>
 	</div>
 }
-
 
 @code {
 	private double? SumPrice = 0;
@@ -242,7 +251,7 @@ else
 			if (a.Item1.AmountProduct > a.Item2)
 			{
 				a.Item1.AmountProduct = a.Item2;
-				ShowError();
+				ShowError(a.Item1.NameProduct);
 				return;
 			}
 		}
@@ -252,7 +261,7 @@ else
 			CUToData();
 			ListCartProduct.Clear();
 		}
-		
+
 	}
 	private void CUToData()
 	{
@@ -346,10 +355,13 @@ else
 			};
 		notificationservice.Notify(a);
 	}
+	private string GetName ="";
 	private bool IsShowError = false;
-	private void ShowError()
+	private void ShowError(string name)
 	{
 		IsShowError = !IsShowError;
+		 GetName = name;
+		Console.WriteLine(GetName);
 	}
 	public void OnCloseShowError()
 	{
