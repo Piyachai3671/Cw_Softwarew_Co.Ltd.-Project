@@ -53,11 +53,30 @@
 								<div style="font-size:20px;position:relative; left:270px; top:-100px;">
 									@if (UserLogin.Level == "admin")
 									{
-										<i class="fa-solid fa-trash bincolor" @onclick="()=>OnDeleteGroup(Group)"></i>
+										<i class="fa-solid fa-trash bincolor" @onclick="()=>SentValue(Group)"  data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
+
+										<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														...
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+														<button type="button" class="btn btn-primary" @onclick="()=>OnDeleteGroup(IDGroup)">Save changes</button>
+													</div>
+												</div>
+											</div>
+										</div>
 									}
 									else
 									{
 										<i class="fa-solid fa-trash bincolor" @onclick="ShowNotificationDelete"></i>
+
 									}
 									
 								</div>
@@ -121,6 +140,12 @@
 		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
 
 	}
+	private GroupMember IDGroup;
+	private void SentValue(GroupMember ID)
+	{
+		IDGroup = ID;
+		OnDeleteGroup(ID);
+	}
 	private void OnDeleteGroup(GroupMember elegroup)
 	{
 		//@foreach (var ListUsers in ListUser)
@@ -133,7 +158,7 @@
 		//}
 		ListGroupMember.Remove(elegroup); //ลบกลุ่มUI
 		var DeleteGroupMember = new GroupMember().ToTable(elegroup);//ลบกลุ่มในSQL
-		groupMemberService.DeleteGroupMember(DeleteGroupMember);
+		//groupMemberService.DeleteGroupMember(DeleteGroupMember);
 		ShowNotificationDeleteForAdmin();
 	}
 	private Task OnAddGroup(GroupMember id)
