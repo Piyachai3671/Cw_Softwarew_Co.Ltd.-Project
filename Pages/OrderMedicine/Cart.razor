@@ -62,38 +62,40 @@ else
 
 
 						<div class="col-lg-1" style="text-align:end;">
-							<button class="btn btn-danger" @onclick="()=>SentValue(IndexCartProduct)" data-bs-toggle="modal" data-bs-target="#ModalDelete"><i class="fa-solid fa-trash-can"></i></button>
+							<button class="btn btn-danger" @onclick="()=>SentValue(IndexCartProduct)"><i class="fa-solid fa-trash-can"></i></button>
 						</div>
 					</div>
-					//Modal ลบสินค้า
-					<div class="modal fade" id="ModalDelete" tabindex="1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="exampleModalLabel"><i class="fa-sharp fa-solid fa-circle-check text-success"></i> กรุณายืนยันคำสั่ง</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<div class="" style="text-align:center;">
-										คุณต้องการที่จะลบกลุ่ม @ValueCartProduct.NameProduct ใช่ หรือ ไม่ ?
+
+					@if (IsShowDelete == true)
+					{
+						<div class="ErrorShowout bg-black bg-opacity-50 d-flex justify-content-center " style="position:absolute;z-index:1;">
+							<div class="row mb-2 d-inline-flex justify-content-end position-relative" style="bottom:-2%;left:80%;">
+							</div>
+							<div class="bg-white ErrorShowin" style="position:relative; top:70px;">
+								<div class="card">
+									<div class="card-header"><i class="fa-solid fa-circle-exclamation text-danger"></i> แจ้งเตือน</div>
+									<div class="card-body d-flex justify-content-center align-items-center " style="position:relative;top:30px;">
+										<div class="row">
+											<div class="col" style="text-align:center;">
+												คุณต้องการที่จะลบสินค้า @ValueCartProduct.NameProduct ใช่ หรือ ไม่ ?
+											</div>
+										</div>
+
+
 									</div>
-
-
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-									<button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="()=>OnDeleteCartProduct2(ValueCartProduct)">ยืนยัน</button>
+									<div class="card-footer" style="margin-top:45px;">
+										<div class="" style="text-align:end; ">
+											<button type="button" class="btn btn-secondary" @onclick="OnCloseDelete">ยกเลิก</button>
+											<button type="button" class="btn btn-success" @onclick="()=>OnDeleteCartProduct2(ValueCartProduct)">ยืนยัน</button>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
 
+					}
 				}
 			}
-
-
-
-
 		</div>
 		<hr>
 		<div class="row " style="text-align:end;">
@@ -283,11 +285,13 @@ else
 	private void SentValue(CartProduct ID)
 	{
 		ValueCartProduct = ID;
+		ShowDelete();
 	}
 	private async Task OnDeleteCartProduct2(CartProduct c)
 	{
 		ListCartProduct.Remove(c);
 		Calculate();
+		OnCloseDelete();
 	}
 
 	private void Calculate()
@@ -312,7 +316,7 @@ else
 				if (IndexCartProduct.AmountProduct == null)
 				{
 					IndexCartProduct.AmountProduct = 1;
-					
+
 					return;
 				}
 				if (IndexCartProduct.AmountProduct > IndexProduct.RemainderProduct)
@@ -409,16 +413,6 @@ else
 		NavigationManager.NavigateTo($"/order/");
 	}
 
-	bool showModal = false;
-
-	void ModalCancel() => showModal = false;
-
-	void ModalOk()
-	{
-		Console.WriteLine("Modal ok");
-		showModal = false;
-	}
-
 	private void ShowNotification()
 	{
 		var a = new NotificationMessage
@@ -455,7 +449,15 @@ else
 	{
 		IsShowErrorMin = !IsShowErrorMin;
 	}
-
+	private bool IsShowDelete = false;
+	private void ShowDelete()
+	{
+		IsShowDelete = !IsShowDelete;
+	}
+	public void OnCloseDelete()
+	{
+		IsShowDelete = !IsShowDelete;
+	}
 }
 
 

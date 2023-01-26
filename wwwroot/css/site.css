@@ -211,6 +211,7 @@ a, .btn-link {
     position: absolute;
     left: 0%;
     top: 0%;
+   padding-top:5%;
 }
 .list_Bill {
     width: 95%;

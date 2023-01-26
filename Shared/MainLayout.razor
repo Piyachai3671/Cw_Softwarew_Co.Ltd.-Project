@@ -189,12 +189,13 @@ else if (Islogin == false)
 	{
 		bool Status =  loginService.LogOut();
 		Islogin = Status;
+		OpenLotOutPage();
 
 	}
-	//private void OpenOrderBillPage(int SentOrderIDPage)
-	//{
-	//	NavigationManager.NavigateTo($"/orderbill/{SentOrderIDPage}");
-	//}
+	private void OpenLotOutPage()
+	{
+		NavigationManager.NavigateTo("/");
+	}
 	private void ShowNotificationLogin()
 	{
 		var a = new NotificationMessage
