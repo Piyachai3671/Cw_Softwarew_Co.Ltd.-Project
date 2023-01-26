@@ -66,7 +66,7 @@ else
 						</div>
 					</div>
 					//Modal ลบสินค้า
-					<div class="modal fade" id="ModalDelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal fade" id="ModalDelete" tabindex="1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 						<div class="modal-dialog">
 							<div class="modal-content">
 								<div class="modal-header">
@@ -133,6 +133,34 @@ else
 				<div class="card-footer" style="margin-top:45px;">
 					<div class="" style="text-align:end; ">
 						<button class="btn btn-primary" @onclick="OnCloseShowError">
+							ตกลง
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+@if (IsShowErrorMin == true)
+{
+	<div class="ErrorShowout bg-black bg-opacity-50 d-flex justify-content-center " style="position:absolute;z-index:1;">
+		<div class="row mb-2 d-inline-flex justify-content-end position-relative" style="bottom:-2%;left:80%;">
+		</div>
+		<div class="bg-white ErrorShowin" style="position:relative; top:70px;">
+			<div class="card">
+				<div class="card-header"><i class="fa-solid fa-circle-exclamation text-danger"></i> แจ้งเตือน</div>
+				<div class="card-body d-flex justify-content-center align-items-center " style="position:relative;top:30px;">
+					<div class="row">
+						<div class="col" style="text-align:center;">
+							สินค้า "@GetName" ต่ำกว่ากำหนดระบบปรับเป็นจำนวนน้อยสุด และกรุณาทำรายการใหม่อีกครั้ง
+						</div>
+					</div>
+
+
+				</div>
+				<div class="card-footer" style="margin-top:45px;">
+					<div class="" style="text-align:end; ">
+						<button class="btn btn-primary" @onclick="OnCloseShowErrorMin">
 							ตกลง
 						</button>
 					</div>
@@ -256,13 +284,6 @@ else
 	{
 		ValueCartProduct = ID;
 	}
-	//private async Task  OnDeleteCartProduct(Tuple<CartProduct, int> c)
-	//{
-	//	Items.Remove(c);
-	//	//ListCartProduct.Remove(c.Item1);
-	//	OnDeleteCartProduct2(c.Item1);
-	//	Calculate();
-	//}
 	private async Task OnDeleteCartProduct2(CartProduct c)
 	{
 		ListCartProduct.Remove(c);
@@ -282,12 +303,22 @@ else
 		{
 			@foreach (var IndexProduct in ListProduct.FindAll(e => e.IDProduct == IndexCartProduct.IDProduct))
 			{
-				if (IndexCartProduct.AmountProduct == 0)
-				{ }
+				if (IndexCartProduct.AmountProduct < 0)
+				{
+					IndexCartProduct.AmountProduct = 1;
+					ShowErrorOverMin(IndexCartProduct.NameProduct);
+					return;
+				}
+				if (IndexCartProduct.AmountProduct == null)
+				{
+					IndexCartProduct.AmountProduct = 1;
+					
+					return;
+				}
 				if (IndexCartProduct.AmountProduct > IndexProduct.RemainderProduct)
 				{
 					IndexCartProduct.AmountProduct = IndexProduct.RemainderProduct;
-					ShowError(IndexCartProduct.NameProduct);
+					ShowErrorOver(IndexCartProduct.NameProduct);
 					return;
 				}
 			}
@@ -403,7 +434,7 @@ else
 	}
 	private string GetName = "";
 	private bool IsShowError = false;
-	private void ShowError(string name)
+	private void ShowErrorOver(string name)
 	{
 		IsShowError = !IsShowError;
 		GetName = name;
@@ -412,6 +443,17 @@ else
 	public void OnCloseShowError()
 	{
 		IsShowError = !IsShowError;
+	}
+	private bool IsShowErrorMin = false;
+	private void ShowErrorOverMin(string name)
+	{
+		IsShowErrorMin = !IsShowErrorMin;
+		GetName = name;
+		Console.WriteLine(GetName);
+	}
+	public void OnCloseShowErrorMin()
+	{
+		IsShowErrorMin = !IsShowErrorMin;
 	}
 
 }
