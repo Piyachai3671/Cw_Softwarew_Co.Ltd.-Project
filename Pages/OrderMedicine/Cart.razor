@@ -17,7 +17,7 @@
 }
 else
 {
-	<div class="container-fluid shadow" style="border-radius:10px; border:none;">
+	<div class="container-fluid shadow" style="border-radius:10px; border:none;" @onclick="Calculate">
 
 		<div class="row">
 			<div class="row mb-3" style="text-align:center; background-color:aquamarine; margin-left:1px; padding:10px;">
@@ -48,19 +48,16 @@ else
 
 						<div class="col d-inline-flex">
 							<buttonn class="btn btn-secondary" @onclick="()=>OnReduceAmount(IndexCartProduct.Cartid)">-</buttonn>
-							<input class="form-control @(true ? "red":"blue")" type="number" @bind="@IndexCartProduct.AmountProduct"
+							<input class="form-control @(true ? "red":"blue")" type="number" @bind="@IndexCartProduct.AmountProduct" @onclick="Calculate"
 					   style="width:60px" max="@IndexProduct.RemainderProduct" min="1">
 							<buttonn class="btn btn-secondary" @onclick="()=>OnAddAmount(IndexCartProduct.Cartid)">+</buttonn>
 						</div>
-
 						<div class="col">
 							@{
 								SumPrice = IndexCartProduct.PriceProduct * IndexCartProduct.AmountProduct;
 							}
 							@SumPrice บาท
 						</div>
-
-
 						<div class="col-lg-1" style="text-align:end;">
 							<button class="btn btn-danger" @onclick="()=>SentValue(IndexCartProduct)"><i class="fa-solid fa-trash-can"></i></button>
 						</div>
@@ -80,8 +77,6 @@ else
 												คุณต้องการที่จะลบสินค้า @ValueCartProduct.NameProduct ใช่ หรือ ไม่ ?
 											</div>
 										</div>
-
-
 									</div>
 									<div class="card-footer" style="margin-top:45px;">
 										<div class="" style="text-align:end; ">
@@ -92,7 +87,6 @@ else
 								</div>
 							</div>
 						</div>
-
 					}
 				}
 			}
@@ -100,7 +94,6 @@ else
 		<hr>
 		<div class="row " style="text-align:end;">
 			<div class="col">
-
 				<div class="me-5">Total : @SumTotal บาท</div>
 				<RadzenButton Text="ชำระเงิน" ButtonStyle="ButtonStyle.Success" Style="font-size:18px;margin-bottom:10px;"
 						  Click="@OnSubmit" />
