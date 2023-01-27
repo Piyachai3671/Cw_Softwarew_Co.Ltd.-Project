@@ -17,7 +17,7 @@
 }
 else
 {
-	<div class="container-fluid shadow" style="border-radius:10px; border:none;" @onclick="Calculate">
+	<div class="container-fluid shadow" style="border-radius:10px; border:none;" @onclick="CalculateRefresh">
 
 		<div class="row">
 			<div class="row mb-3" style="text-align:center; background-color:aquamarine; margin-left:1px; padding:10px;">
@@ -48,11 +48,11 @@ else
 
 						<div class="col d-inline-flex">
 							<buttonn class="btn btn-secondary" @onclick="()=>OnReduceAmount(IndexCartProduct.Cartid)">-</buttonn>
-							<input class="form-control @(true ? "red":"blue")" type="number" @bind="@IndexCartProduct.AmountProduct" @onclick="Calculate"
-					   style="width:60px" max="@IndexProduct.RemainderProduct" min="1">
+							<input class="form-control @(true ? "red":"blue")" type="text" pattern="[0-9]+" @oninput="Calculate" @bind="@IndexCartProduct.AmountProduct" @onclick="CalculateRefresh"
+					   style="width:100px;" max="@IndexProduct.RemainderProduct" min="1">
 							<buttonn class="btn btn-secondary" @onclick="()=>OnAddAmount(IndexCartProduct.Cartid)">+</buttonn>
 						</div>
-						<div class="col">
+						<div class="col ">
 							@{
 								SumPrice = IndexCartProduct.PriceProduct * IndexCartProduct.AmountProduct;
 							}
@@ -165,8 +165,38 @@ else
 	</div>
 }
 
+@if (IsShowErrorInput == true)
+{
+	<div class="ErrorShowout bg-black bg-opacity-50 d-flex justify-content-center " style="position:absolute;z-index:1;">
+		<div class="row mb-2 d-inline-flex justify-content-end position-relative" style="bottom:-2%;left:80%;">
+		</div>
+		<div class="bg-white ErrorShowin" style="position:relative; top:70px;">
+			<div class="card">
+				<div class="card-header"><i class="fa-solid fa-circle-exclamation text-danger"></i> แจ้งเตือน</div>
+				<div class="card-body d-flex justify-content-center align-items-center " style="position:relative;top:30px;">
+					<div class="row">
+						<div class="col" style="text-align:center;">
+							จำนวนสินค้าต่ำกว่ากำหนด กรุณาทำรายการใหม่อีกครั้ง
+						</div>
+					</div>
+
+
+				</div>
+				<div class="card-footer" style="margin-top:45px;">
+					<div class="" style="text-align:end; ">
+						<button class="btn btn-primary" @onclick="OnCloseErrorInput">
+							ตกลง
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
 @code {
 	private double? SumPrice = 0;
+	private double? SumPrice2 = 0;
 	private double SumTotal = 0;
 	private int Amount = 0;
 
@@ -191,6 +221,7 @@ else
 
 	protected override async Task OnInitializedAsync()
 	{
+
 		//ListOrderItems = await orderItemService.GetOrderItemServices();
 		var OrderItems = await orderItemService.GetOrderItemServices();
 		foreach (var orderitem in OrderItems)
@@ -205,7 +236,7 @@ else
 		{
 			ListProduct.Add(new Product().ToUi(Product));
 		}
-		Calculate();
+		//Calculate();
 
 		var Orders = await orderService.GetOrderAsync();
 		foreach (var order in Orders)
@@ -235,6 +266,7 @@ else
 		//		on c.Cartid equals p.IDProduct
 		//		select (new Tuple<CartProduct, int>(c, (p.RemainderProduct ?? 0)));
 		//Items = i.ToList();
+		CalculateRefresh();
 		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
 	}
 
@@ -283,39 +315,93 @@ else
 	private async Task OnDeleteCartProduct2(CartProduct c)
 	{
 		ListCartProduct.Remove(c);
-		Calculate();
+		CalculateRefresh();
 		OnCloseDelete();
 	}
-
-	private void Calculate()
+	private void CalculateRefresh()
 	{
-
 		SumTotal = (ListCartProduct.Sum(e => e.PriceProduct! * e.AmountProduct!)) ?? 0.0;
+	}
+	private void Calculate(ChangeEventArgs IP)
+	{
+		CalculateRefresh();
+		try
+		{
+			//Console.WriteLine(IP.Value);
+			int CountIP = Convert.ToInt32(IP.Value);
+			if (CountIP <0 )
+			{
+				ShowErrorInput();
+				SumTotal = 0;
+				return;
+			}
+			
+			
+		}
+		catch
+		{
+		}
+
+		//SumTotal = (ListCartProduct.Sum(e => e.PriceProduct! * e.AmountProduct!)) ?? 0.0;
 
 	}
 	private bool CheckConfirm = false;
-	private void OnSubmit()
+	private void ProtectOverMin()
 	{
 		@foreach (var IndexCartProduct in ListCartProduct)
 		{
 			@foreach (var IndexProduct in ListProduct.FindAll(e => e.IDProduct == IndexCartProduct.IDProduct))
 			{
-				if (IndexCartProduct.AmountProduct < 0)
+				if (IndexCartProduct.AmountProduct <= 0)
 				{
 					IndexCartProduct.AmountProduct = 1;
 					ShowErrorOverMin(IndexCartProduct.NameProduct);
+					CalculateRefresh();
 					return;
 				}
 				if (IndexCartProduct.AmountProduct == null)
 				{
 					IndexCartProduct.AmountProduct = 1;
-
+					ShowErrorOverMin(IndexCartProduct.NameProduct);
+					CalculateRefresh();
 					return;
 				}
 				if (IndexCartProduct.AmountProduct > IndexProduct.RemainderProduct)
 				{
 					IndexCartProduct.AmountProduct = IndexProduct.RemainderProduct;
 					ShowErrorOver(IndexCartProduct.NameProduct);
+					CalculateRefresh();
+					return;
+				}
+			}
+		}
+	}
+	private void OnSubmit()
+	{
+		CalculateRefresh();
+		@foreach (var IndexCartProduct in ListCartProduct)
+		{
+			@foreach (var IndexProduct in ListProduct.FindAll(e => e.IDProduct == IndexCartProduct.IDProduct))
+			{
+				if (IndexCartProduct.AmountProduct <= 0)
+				{
+					IndexCartProduct.AmountProduct = 1;
+					ShowErrorOverMin(IndexCartProduct.NameProduct);
+					
+					return;
+				}
+				if (IndexCartProduct.AmountProduct == null)
+				{
+					IndexCartProduct.AmountProduct = 1;
+					ShowErrorOverMin(IndexCartProduct.NameProduct);
+					
+					return;
+				}
+				if (IndexCartProduct.AmountProduct > IndexProduct.RemainderProduct)
+				{
+					IndexCartProduct.AmountProduct = IndexProduct.RemainderProduct;
+					ShowErrorOver(IndexCartProduct.NameProduct);
+					
 					return;
 				}
 			}
@@ -419,6 +505,19 @@ else
 			};
 		notificationservice.Notify(a);
 	}
+	private void ShowNotificationError()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Error,
+				Summary = "มีบางอย่างผิดพลาด !",
+				Detail = "",
+				Duration = 5000,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
 	private string GetName = "";
 	private bool IsShowError = false;
 	private void ShowErrorOver(string name)
@@ -436,6 +535,7 @@ else
 	{
 		IsShowErrorMin = !IsShowErrorMin;
 		GetName = name;
+		CalculateRefresh();
 		Console.WriteLine(GetName);
 	}
 	public void OnCloseShowErrorMin()
@@ -450,6 +550,17 @@ else
 	public void OnCloseDelete()
 	{
 		IsShowDelete = !IsShowDelete;
+	}
+
+	private bool IsShowErrorInput = false;
+	private void ShowErrorInput()
+	{
+		IsShowErrorInput = !IsShowErrorInput;
+		CalculateRefresh();
+	}
+	public void OnCloseErrorInput()
+	{
+		IsShowErrorInput = !IsShowErrorInput;
 	}
 }
 
