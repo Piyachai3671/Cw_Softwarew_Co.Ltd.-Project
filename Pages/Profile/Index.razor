@@ -127,7 +127,7 @@
 
 										@if (CurrentImg == "")
 										{
-											<img class="mt-3" src="img/@UserLogin.UserImgName" width="400" height="400">
+											<img class="mt-3" src="img\@UserLogin.UserImgName" width="400" height="400">
 										}
 										@if (isLoading == true) //ถ้ามีการเพิ่มรูป จะทำการแสดงข้อความ
 										{
@@ -181,8 +181,8 @@
 				Console.WriteLine(Path.GetRandomFileName());
 				var trustedFileNameForFileStorage = Path.GetRandomFileName() + file.Name;
 				CurrentImg = trustedFileNameForFileStorage;
-				var path = Path.Combine(Environment.ContentRootPath,
-						"wwwroot", "img", trustedFileNameForFileStorage);
+				var path = Path.Combine(
+						 "wwwroot","img", trustedFileNameForFileStorage);
 				CurrentPathImg = path;
 				await using FileStream fs = new(path, FileMode.Create);
 				await file.OpenReadStream(maxFileSize).CopyToAsync(fs);

@@ -7,25 +7,7 @@
 @inject LoginService loginService
 @inject NotificationService notificationservice
 
-<!--
-@if (adduser == null)
-{
-	<p>Loading </p>
-}
-else
-{
-	<RadzenGrid AllowPaging="true" AllowFiltering="true"
-		PageSize="2" AllowSorting="true" Data="@adduser" TItem="AddUser" ColumnWidth="150px">
-		<Columns>
-			<RadzenGridColumn TItem="AddUser" Property="UserID" Title="User ID" ></RadzenGridColumn>
-			<RadzenGridColumn TItem="AddUser" Property="Email" Title="Email"></RadzenGridColumn>
-			<RadzenGridColumn TItem="AddUser" Property="Username" Title="Username"></RadzenGridColumn>
-			<RadzenGridColumn TItem="AddUser" Property="Department" Title="Department"></RadzenGridColumn>
 
-		</Columns>
-	</RadzenGrid>
-}
--->
 <!-- รูปแบบเก่าที่ไม่ใช้ Component -->
 <div class="">
 
@@ -37,7 +19,7 @@ else
 	}
 
 </div>
-<div class="">
+@*<div class="">
 	<table class="table table-hover">
 		<thead>
 			<tr>
@@ -58,8 +40,6 @@ else
 				{
 					var tempint = i;
 
-					@*@foreach(var User in ListUsers.FindAll(e => e.GroupID == GetCurrentGroupIDPage))
-			{*@
 					<tr>
 						<td>@(i + 1)</td>
 						<th scope="row">
@@ -71,50 +51,80 @@ else
 						<td>
 							@if (UserLogin.Level == "admin")
 							{
-								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>OnDeleteMember(ListUsers[tempint])">
+								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>SentValue(ListUsers[tempint])" data-bs-toggle="modal" data-bs-target="#ModalDelete">
 									ลบสมาชิก
 								</div>
+						
 							}
 							else
 							{
 								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="ShowNotificationAlert">
-									ลบสมาชิก 
+									ลบสมาชิก
 								</div>
 							}
 						</td>
 					</tr>
 				}
 			}
-
-			<!--
-				<RadzenDataGrid FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
-							PageSize="10" Data="@ListUsers.Where(e=>e.GroupID == GetCurrentGroupIDPage)" TItem="User" ColumnWidth="150px">
-					<Columns>
-
-						<RadzenDataGridColumn TItem="User" Title="ดูรายละเอียดเพิ่มเติม">
-			@*<Template Context="data">
-						<RadzenButton Click=@(args => OpenOrderBillPage(data.OrderID))
-								  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" />
-					</Template>*@
-						</RadzenDataGridColumn>
-					<RadzenDataGridColumn TItem="User" Property="UserImgName" Title="รูป" >
-						<Template Context="User">
-							<RadzenImage Path="@($"data:img/")" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
-
-						</Template>
-					</RadzenDataGridColumn>
-					<RadzenDataGridColumn TItem="User" Property="Name" Title="ชื่อ - สกุล / บาท" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
-					<RadzenDataGridColumn TItem="User" Property="Department" Title="แผนก" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
-						<RadzenDataGridColumn TItem="User" Property="" Title="" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
-
-					</Columns>
-				</RadzenDataGrid>
-			-->
-
-
 		</tbody>
 
 	</table>
+</div>*@
+<RadzenDataGrid FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
+				PageSize="10" Data="@ListUsers.Where(e=>e.GroupID == GetCurrentGroupIDPage)" TItem="User" ColumnWidth="150px">
+	<Columns>
+
+		<RadzenDataGridColumn TItem="User" Title="#">
+			<Template Context="data">
+				@(ListUsers.IndexOf(data) + 1)
+			</Template>
+
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn TItem="User" Property="" Title="ภาพ">
+			<Template Context="User">
+				@*<RadzenImage Path="@($"data:img/")" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />*@
+				<RadzenImage Path="@("img/"+User.UserImgName )" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
+
+			</Template>
+		</RadzenDataGridColumn>
+		<RadzenDataGridColumn TItem="User" Property="Name" Title="ชื่อ - นามสกุล" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+		<RadzenDataGridColumn TItem="User" Property="Department" Title="แผนก" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+		<RadzenDataGridColumn TItem="User" Property="" Title="ลบสมาชิก" Filterable="false" TextAlign="TextAlign.Center">
+
+			<Template Context="data">
+				<RadzenButton Click=@(args => SentValue(data)) data-bs-toggle="modal" data-bs-target="#ModalDelete"
+							  ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="delete" Class="m-1" />
+			</Template>
+			@*<Template Context="data">
+			<RadzenButton Click=@(args => OpenOrderBillPage(data.OrderID))
+			ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" />
+			</Template>*@
+		</RadzenDataGridColumn>
+
+	</Columns>
+</RadzenDataGrid>
+
+@*//Modal ปุ่มยืนยันลบ*@
+<div class="modal fade" id="ModalDelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel"><i class="fa-sharp fa-solid fa-circle-check text-success"></i> กรุณายืนยันคำสั่ง</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="" style="text-align:center;">
+					คุณต้องการที่จะลบสมาชิก @ValueUser.Name ใช่ หรือ ไม่ ?
+				</div>
+
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+				<button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="()=>OnDeleteMember(ValueUser)">ยืนยัน</button>
+			</div>
+		</div>
+	</div>
 </div>
 <div class="position-sticky" style=" bottom:0px; text-align:end;  ">
 	<div class="row">
@@ -149,6 +159,7 @@ else
 	private User? UserLogin = new();
 	private User? UserE = new();
 	int i = 1;
+	private User? ValueUser = new();
 	//private List<User?> User = new();
 	protected override async Task OnInitializedAsync()
 	{
@@ -208,7 +219,7 @@ else
 		var a = new NotificationMessage
 			{
 				Severity = NotificationSeverity.Error,
-				Summary = "สมาชิกถูกลบแล้ว",
+				Summary = "สมาชิกชื่อ " + ValueUser.Name + " ถูกลบแล้ว",
 				Detail = "",
 				Duration = 2700,
 				CloseOnClick = true,
@@ -228,6 +239,10 @@ else
 				Payload = DateTime.Now
 			};
 		notificationservice.Notify(a);
+	}
+	private void SentValue(User? ID)
+	{
+		ValueUser = ID;
 	}
 }
 
