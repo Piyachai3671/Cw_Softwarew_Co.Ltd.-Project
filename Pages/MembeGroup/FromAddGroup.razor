@@ -52,7 +52,9 @@
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
 				<button type="button" class="btn btn-success" click="onSave" @onclick="OnClickAddGroup">ยืนยัน</button>
 			</div>
-
+			<EditForm Model="@ModelGroup">
+				<InputText @bind-Value="ModelGroup.GroupName"></InputText>
+			</EditForm>
 
 
 		</div>
@@ -61,6 +63,7 @@
 
 
 @code {
+	private GroupMember ModelGroup = new();
 	[Parameter]
 	public EventCallback<GroupMember> GetAddGroupID { get; set; }
 
