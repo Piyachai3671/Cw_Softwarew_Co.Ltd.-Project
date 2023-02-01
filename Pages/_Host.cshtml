@@ -39,5 +39,20 @@
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
 
     <script src="_content/BlazorInputFile/inputfile.js"></script>
+    <!-- Script Print -->
+    <script type="text/javascript">
+        function Print() {
+
+            var divcontent = document.getElementById("PrintDiv").innerHTML;
+            var a = window.open('', '', 'height=600,width=600');
+            a.document.write('<html>');
+            a.document.write('<body><br/>');
+            a.document.write(divcontent);
+            a.document.write('</body></html>');
+            a.document.close;
+            a.print();
+        }
+    </script>
+
 </body>
 </html>

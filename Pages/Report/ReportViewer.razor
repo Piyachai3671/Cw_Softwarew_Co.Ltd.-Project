@@ -1,0 +1,145 @@
+﻿@page "/reportViewer"
+@inject IJSRuntime js
+@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject ReportService reportService
+@inject UserService userService
+@inject NavigationManager NavigationManager
+
+
+<h1> Report in Blazor</h1>
+
+<div class="col-12">
+	<div class="col-12" style="text-align:end;">
+		<a class="btn btn-success" href="" target="_parent">Log Out</a>
+	</div>
+</div>
+<br/>
+<!-------------------------------------------->
+
+<div class="container border-card">
+	<div class="row">
+		<div class="card-header" style=" color:#ffffff; background: linear-gradient( 90deg,#8BD2EC,#92CEA8, #FCEE9E,#FFF3D7);">
+			<div class="col-12 bd-highlight">
+				<div class="col-12 flex-grow-1 bd-highlight">
+					<h3>Print Report</h3>
+				</div>
+				<div class="row" style="text-align:center">
+					<div class="col-3  bd-highlight">
+						<button type="button" @onclick="OpenOrderSuccess" style="width:120px;height:60px;text-align:center" class="btn btn-primary" data-bs-toggle="modal" 
+						data-bs-target="#PrintDiv">
+							รายงานการสั่งซื้อสินค้า
+						</button>
+					</div>
+		
+					<div class="col-3 bd-highlight">
+						<button type="button" @onclick="OpenProductTotal" style="width:120px;height:60px;text-align:center" class="btn btn-primary" data-bs-toggle="modal" 
+						data-bs-target="#PrintDiv">
+							รายงานสินค้าในคลัง
+						</button>
+					</div>
+
+					<div class="col-3  bd-highlight">
+						<button type="button" @onclick="OpenIndexOrder" style="width:120px;height:60px;text-align:center" class="btn btn-primary" data-bs-toggle="modal" 
+						data-bs-target="#PrintDiv">
+							ประวัติผู้สั่งซื้อ
+						</button>
+					</div>
+
+					<div class="col-3  bd-highlight">
+						<button type="button" @onclick="OpenIndexOrder" style="width:120px;height:60px;text-align:center" class="btn btn-primary" data-bs-toggle="modal" 
+						data-bs-target="#PrintDiv">
+							อื่นๆ
+						</button>
+					</div>		
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br/>
+
+<div class="row">
+    <div class="col-12">
+		@*<div id="PrintDiv">*@
+			@*style="border:1px solid black;min-height:600px; min-width:400px;padding:10px;"*@
+
+
+				<div class="modal fade;" id="PrintDiv" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content navbar-nav-scroll" style="width:1500px;height:2600px;right:100%;">
+
+							<div class="modal-header">
+								<h5 class="modal-title">รายงาน</h5>
+								<i class="fa-solid fa-xmark fa-2xl" data-bs-dismiss="modal"></i>
+							</div>
+
+							<div class="modal-body">								
+									@html								
+							</div>
+
+							<div style="text-align:center;">
+								<div class="modal-footer">				
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									<button type="button" class="btn btn-primary" @onclick="Print">Print</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					
+				</div>
+
+			
+		@*</div>*@
+    </div>
+</div>	
+
+
+
+@code {
+	public RenderFragment html;
+
+	public void OpenOrderSuccess()
+	{
+		RenderFragment CreateDynamicComponent() => builder =>
+		{
+			builder.OpenComponent(0, typeof(PrintViwer.RP_OrderSuccess)); //ฟังก์ชั่นดึงไฟล์ที่เรียกมาแสดง
+			builder.AddAttribute(0,"HeadTitle","รายงานการสั่งซื้อ");  //Passing HeadTitle
+			builder.CloseComponent();
+		};
+		html = CreateDynamicComponent();
+	}
+
+	public void OpenProductTotal()
+	{
+		RenderFragment CreateDynamicComponent() => builder =>
+		{
+			builder.OpenComponent(0, typeof(PrintViwer.RP_SellProduct)); //ฟังก์ชั่นดึงไฟล์ที่เรียกมาแสดง
+			builder.AddAttribute(0, "HeadTitle", "รายงานสินค้า");  //Passing HeadTitle
+			builder.CloseComponent();
+		};
+		html = CreateDynamicComponent();
+	}
+
+	public void OpenIndexOrder()
+	{
+		RenderFragment CreateDynamicComponent() => builder =>
+		{
+			builder.OpenComponent(0, typeof(PrintViwer.RP_ProfileProduct)); //ฟังก์ชั่นดึงไฟล์ที่เรียกมาแสดง
+			//builder.AddAttribute(0, "HeadTitle", "ข้อมูลประจำตัวผู้สั่งซื้อ");  //Passing HeadTitle
+			builder.CloseComponent();
+		};
+		html = CreateDynamicComponent();
+	}
+
+
+
+	/****************************************************/
+	public async Task Print()  //กดปริ้น
+	{
+		await js.InvokeVoidAsync("Print"); //ห้ามเปลี่ยนเด็ดขาด
+	}
+	/****************************************************/
+}
