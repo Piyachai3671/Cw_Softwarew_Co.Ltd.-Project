@@ -66,6 +66,8 @@
 				<div class="card-body p-md-5">
 
 					<EditForm Model="@UserLogin">
+						<DataAnnotationsValidator />
+						<ValidationSummary />
 						<div class="row just-center">
 							<div class="col-md-10 col-lg-6 col-xl-5 ify-contentorder-2 order-lg-1">
 								<p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">ประวัติส่วนตัว</p>
@@ -81,7 +83,8 @@
 									<div class="d-flex flex-row align-items-center mb-4">
 										<i class="fa-solid fa-phone fa-lg me-3 fa-fw"></i>
 										<div class="form-outline flex-fill mb-0">
-											<InputText @bind-Value="@UserLogin.Tel" type="text" id="form3Example3c" class="form-control" />
+											<InputText @bind-Value="@UserLogin.Tel" type="text" class="form-control" />
+											<ValidationMessage For="@(()=>UserLogin.Tel)" />
 											<label class="form-label" for="form3Example3c">เบอร์โทร</label>
 										</div>
 									</div>
@@ -90,7 +93,7 @@
 										<i class="fa-solid fa-id-badge fa-lg me-3 fa-fw"></i>
 										<div class="form-outline flex-fill mb-0">
 											<InputSelect @bind-Value="UserLogin.Department" class="form-control" style="height:40px; width:150px;" id="form3Example3c">
-												<option disabled value="">เลือกแผนก</option>
+												<option value="">เลือกแผนก</option>
 												<option value="Software">Software</option>
 												<option value="Account">Account</option>
 												<option value="Maid">Maid</option>
@@ -104,16 +107,19 @@
 									<div class="d-flex flex-row align-items-center mb-4">
 										<i class="fa-sharp fa-solid fa-key fa-lg me-3 fa-fw"></i>
 										<div class="form-outline flex-fill mb-0">
-											<InputText @bind-Value="@UserLogin.Password" type="password" id="form3Example3c" class="form-control" />
-											<label class="form-label" for="form3Example3c">รหัสผ่าน</label>
-										</div>
-									</div>
+											<div class="input-container">
+												<InputText @bind-Value="@UserLogin.Password" type="@ShowPassword" id="InputPassWord" class="form-control" />
+												<label class="form-label" for="">รหัสผ่าน</label>
+												<span>
+													<i class="@Icon" style="cursor:pointer;" @onclick="OnShowPassword">
+													</i>
+												</span>
+														
+													
+											</div>
+											<!-- style="position:relative;bottom:63px; left:300px;"-->
 
-									<div class="form-check d-flex justify-content-center mb-5">
-										<input class="form-check-input me-2" type="checkbox" value="" id="form2Example3c" />
-										<label class="form-check-label" for="form2Example3">
-											I agree all statements in <a href="#!">Terms of service</a>
-										</label>
+										</div>
 									</div>
 
 								</form>
@@ -125,20 +131,15 @@
 										class="img-fluid shadow" style="border-radius:10px;">*@
 
 
-										@if (CurrentImg == "")
+										@if (isLoading == false)
 										{
-											<img class="mt-3" src="img\@UserLogin.UserImgName" width="400" height="400">
+											<img class="mt-3" src="img/@UserLogin.UserImgName" width="400" height="400">
 										}
 										@if (isLoading == true) //ถ้ามีการเพิ่มรูป จะทำการแสดงข้อความ
-										{
-											<p>Loading . . .</p>
-
-										}
-										else //จากนั้นจะเปลี่ยนให้ทำการอัพโหลด
-										{
+										{								
 											@foreach (var file in loadedFiles)
-											{				
-												<img class="mt-3" src="img/@CurrentImg" width="400" height="400">
+											{
+												<img class="mt-3" src="img/@UserLogin.UserImgName" width="400" height="400">
 											}
 										}
 									</div>
@@ -149,10 +150,11 @@
 							</div>
 
 						</div>
+
+						<div class="mt-5 d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+							<button class="btn btn-primary btn-lg" @onclick="OnClickEditUser">บันทึก</button>
+						</div>
 					</EditForm>
-					<div class="mt-5 d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-						<button class="btn btn-primary btn-lg" @onclick="OnClickEditUser">บันทึก</button>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -161,6 +163,112 @@
 </div>
 
 @code {
+	
+
+
+	public List<User> ListUser = new List<User>();
+
+	private User? UserLogin = new();
+	private User ModelUser = new();
+	private bool StatusShowPasswrod = false;
+	private string ShowPassword = "password";
+	private string Icon = "fa-solid fa-lock"
+	;
+	protected override async Task OnInitializedAsync()
+	{
+
+		var Users = await userService.GetUserAsync();
+		foreach (var user in Users)
+		{
+			ListUser.Add(new User().ToUi(user));
+		}
+
+		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+
+	}
+
+	private void OnClickEditUser()
+	{
+		string InputTel = UserLogin.Tel;
+		string InputPassword = UserLogin.Password;
+
+
+		if (UserLogin.Tel == null || UserLogin.Password == null || UserLogin.Department == "")
+		{
+			ShowNotificationErrorInput();
+			return;
+		}
+		if (InputTel.Length != 10 || InputPassword.Length < 6)
+		{
+			ShowNotificationErrorInput();
+			return;
+		}
+
+		if (UserLogin.Tel != null || UserLogin.Password != null)
+		{
+
+			@foreach (var User in ListUser.FindAll(e => e.UserID == UserLogin.UserID))
+			{
+				User.Department = UserLogin.Department;
+				User.Tel = UserLogin.Tel;
+				User.Password = UserLogin.Password;
+				User .UserImgName= CurrentImg;
+				User.UserPath = CurrentPathImg;
+				var a = new User().ToTable(User); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+				userService.EditUser(a); //บันทึกข้อมูล
+				ShowNotificationSuccessEdit();
+
+			}
+			UserLogin.Department = UserLogin.Department;
+			UserLogin.Tel = UserLogin.Tel;
+			UserLogin.Password = UserLogin.Password;
+		}
+
+	}
+
+	private void ShowNotificationSuccessEdit()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Success,
+				Summary = "แก้ไขสำเร็จ",
+				Detail = "",
+				Duration = 2700,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
+	private void ShowNotificationErrorInput()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Error,
+				Summary = "กรูณากรอกข้อมูลให้ถูกต้อง",
+				Detail = "",
+				Duration = 2700,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
+
+	private void OnShowPassword()
+	{
+		StatusShowPasswrod = !StatusShowPasswrod;
+		if (StatusShowPasswrod == true)
+		{
+			Icon = "fa - solid fa-lock-open";
+			ShowPassword = "text";
+		}
+		if (StatusShowPasswrod == false)
+		{
+			Icon = "fa - solid fa-lock";
+			ShowPassword = "password";
+		}
+
+
+	}
 	private List<string> CurrentImg1 = new List<string>();
 	private List<IBrowserFile> loadedFiles = new();
 	private long maxFileSize = (1024 * 10) * 1024;
@@ -170,6 +278,7 @@
 	public string CurrentPathImg = "";
 	private async Task LoadFiles(InputFileChangeEventArgs e)
 	{
+
 		isLoading = true;
 		loadedFiles.Clear();
 
@@ -181,8 +290,9 @@
 				Console.WriteLine(Path.GetRandomFileName());
 				var trustedFileNameForFileStorage = Path.GetRandomFileName() + file.Name;
 				CurrentImg = trustedFileNameForFileStorage;
+				UserLogin.UserImgName = trustedFileNameForFileStorage;
 				var path = Path.Combine(
-						 "wwwroot","img", trustedFileNameForFileStorage);
+							"wwwroot", "img", trustedFileNameForFileStorage);
 				CurrentPathImg = path;
 				await using FileStream fs = new(path, FileMode.Create);
 				await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
@@ -200,54 +310,4 @@
 		isLoading = false;
 	}
 
-
-	public List<User> ListUser = new List<User>();
-
-	private User? UserLogin = new();
-	private User ModelUser = new();
-
-	protected override async Task OnInitializedAsync()
-	{
-
-		var Users = await userService.GetUserAsync();
-		foreach (var user in Users)
-		{
-			ListUser.Add(new User().ToUi(user));
-		}
-
-		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
-
-	}
-	private void OnClickEditUser()
-	{
-		@foreach (var User in ListUser.FindAll(e => e.UserID == UserLogin.UserID))
-		{
-			User.Department = UserLogin.Department;
-			User.Tel = UserLogin.Tel;
-			User.Password = UserLogin.Password;
-			User.UserImgName = CurrentImg;
-			User.UserPath = CurrentPathImg;
-			var a = new User().ToTable(User); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
-			userService.EditUser(a); //บันทึกข้อมูล
-			ShowNotificationSuccessEdit();
-
-		}
-		UserLogin.Department = UserLogin.Department;
-		UserLogin.Tel = UserLogin.Tel;
-		UserLogin.Password = UserLogin.Password;
-	}
-
-	private void ShowNotificationSuccessEdit()
-	{
-		var a = new NotificationMessage
-			{
-				Severity = NotificationSeverity.Success,
-				Summary = "แก้ไขสำเร็จ",
-				Detail = "",
-				Duration = 2700,
-				CloseOnClick = true,
-				Payload = DateTime.Now
-			};
-		notificationservice.Notify(a);
-	}
 }

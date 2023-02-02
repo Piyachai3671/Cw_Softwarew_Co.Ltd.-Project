@@ -54,7 +54,7 @@
 								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>SentValue(ListUsers[tempint])" data-bs-toggle="modal" data-bs-target="#ModalDelete">
 									ลบสมาชิก
 								</div>
-						
+
 							}
 							else
 							{
@@ -89,18 +89,31 @@
 		</RadzenDataGridColumn>
 		<RadzenDataGridColumn TItem="User" Property="Name" Title="ชื่อ - นามสกุล" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
 		<RadzenDataGridColumn TItem="User" Property="Department" Title="แผนก" Filterable="false" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
-		<RadzenDataGridColumn TItem="User" Property="" Title="ลบสมาชิก" Filterable="false" TextAlign="TextAlign.Center">
+		@if (UserLogin.Level == "admin")
+		{
+			<RadzenDataGridColumn TItem="User" Property="" Title="ลบสมาชิก" Filterable="false" TextAlign="TextAlign.Center">
 
-			<Template Context="data">
-				<RadzenButton Click=@(args => SentValue(data)) data-bs-toggle="modal" data-bs-target="#ModalDelete"
+				<Template Context="data">
+					<RadzenButton Click=@(args => SentValue(data)) data-bs-toggle="modal" data-bs-target="#ModalDelete"
 							  ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="delete" Class="m-1" />
-			</Template>
-			@*<Template Context="data">
+				</Template>
+
+				@*<Template Context="data">
 			<RadzenButton Click=@(args => OpenOrderBillPage(data.OrderID))
 			ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" />
 			</Template>*@
-		</RadzenDataGridColumn>
+			</RadzenDataGridColumn>
+		}
+		@if (UserLogin.Level == null)
+		{
+			<RadzenDataGridColumn TItem="User" Property="" Title="ลบสมาชิก" Filterable="false" TextAlign="TextAlign.Center">
 
+				<Template Context="data">
+					<RadzenButton Click=ShowNotificationAlert
+							  ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="delete" Class="m-1" />
+				</Template>
+			</RadzenDataGridColumn>
+		}
 	</Columns>
 </RadzenDataGrid>
 

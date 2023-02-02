@@ -3,13 +3,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CW_ordermedicine.Data.Models
 {
-	public class User
+	public class User 
 	{
 		public int UserID { get; set; }
 
 		public string? Name { get; set; }
 		public string? Username { get; set; }
+		[Required(ErrorMessage = "กรุณากรอกรหัสผ่าน !")]
+		[MinLength(6, ErrorMessage = "รหัสผ่านต้องมีมากกว่า 6 ตัวอักษรขึ้นไป !")]
 		public string? Password { get; set; }
+		[Required(ErrorMessage = "กรุณากรอกเบอร์โทรศัพท์ !")]
+		[MinLength(10 , ErrorMessage = "เบอร์โทรศัพท์ต้องมี 10 หลัก !")]
 		public string? Tel { get; set; }
 		public string? Department { get; set; }
 		public string? Level { get; set; }

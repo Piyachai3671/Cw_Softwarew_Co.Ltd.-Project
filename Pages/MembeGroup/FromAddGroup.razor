@@ -30,7 +30,7 @@
 
 								<label class="mt-2">
 									แผนก:
-									<InputSelect @bind-Value="Group.Department">
+									<InputSelect @bind-Value="Group.Department" style="height:30px; width:150px;">
 										<option value="">เลือกแผนก</option>
 										<option value="Software">Software</option>
 										<option value="Account">Account</option>
@@ -52,9 +52,6 @@
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
 				<button type="button" class="btn btn-success" click="onSave" @onclick="OnClickAddGroup">ยืนยัน</button>
 			</div>
-			<EditForm Model="@ModelGroup">
-				<InputText @bind-Value="ModelGroup.GroupName"></InputText>
-			</EditForm>
 
 
 		</div>

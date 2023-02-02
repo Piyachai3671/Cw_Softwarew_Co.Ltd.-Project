@@ -4,6 +4,7 @@
 @using CW_ordermedicine.Data.Services
 @inject ReportService reportService
 @inject UserService userService
+@inject LoginService loginService
 @inject NavigationManager NavigationManager
 
 <div class="container-fluid">
@@ -68,6 +69,14 @@
 							<b>
 								<span class="mathsign">&sum;</span> @String.Format("{0:THB #,##0.00}",FinancialStructureValuseEur)
 							</b>*@
+							
+							@*@if (CreateToVar == "")//มันสร้างvarได้แค่ภายในIFเลยต้องIFว่างๆมา//วิธีสำหรับให้เห็นราคารวมของแต่ละร้านค้า
+							{
+								var Report = ListReport.FindAll(e => e.ReportUserID == UserLogin.UserID);
+								@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}",
+						Report.Sum(e=>e.ReportPriceSum)
+						)
+							}*@
 							ราคารวม : <b>@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", ListReport.Sum(o => o.ReportPriceSum))</b> บาท
 						</FooterTemplate>
 					</RadzenDataGridColumn>
@@ -90,6 +99,8 @@
 @code {
 	private List<CW_ordermedicine.Data.Models.Report> ListReport = new List<CW_ordermedicine.Data.Models.Report>();
 	private List<User> ListUsers = new List<User>();
+	private User UserLogin = new();
+	private string CreateToVar = "";
 	protected override async Task OnInitializedAsync()
 	{
 		var Reports = await reportService.GetReportsAsync();
@@ -102,7 +113,7 @@
 		{
 			ListUsers.Add(new User().ToUi(User));
 		}
-
+		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
 	}
 
 	IEnumerable<string> selectedDepartment;
