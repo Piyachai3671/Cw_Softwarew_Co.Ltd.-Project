@@ -59,7 +59,6 @@
 						</FilterTemplate>
 					</RadzenDataGridColumn>
 
-<<<<<<< HEAD
 					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ">
 						<Template Context="report">
 							@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", report.ReportPriceSum)
@@ -82,9 +81,9 @@
 							ราคารวม : <b>@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", ListReport.Sum(o => o.ReportPriceSum))</b> บาท
 						</FooterTemplate>
 					</RadzenDataGridColumn>
-=======
+
 					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ"></RadzenDataGridColumn>
->>>>>>> 740e3d176a67e53c06ff9d3b2ab996361b581c30
+
 					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportDate" Title="วันเวลาทำรายการ" FormatString="{0:d}"></RadzenDataGridColumn>
 
 				</Columns>

@@ -3,6 +3,7 @@
 @inject GroupMemberService groupMemberService
 @inject UserService userService
 @inject LoginService loginService
+@inject NotificationService notificationservice
 
 @page "/dropdown"
 <div class="modal fade" id="FromAddGroup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -18,14 +19,14 @@
 						<div class="col-12">
 
 							<EditForm Model="@Group">
-								<DataAnnotationsValidator></DataAnnotationsValidator>
-
+								<DataAnnotationsValidator/>
+								<ValidationSummary />
 
 
 								<div class="form-group mt-2">
 									<label for="productname">ชื่อกลุ่ม</label>
 									<InputText @bind-Value="Group.GroupName" type="text" class="form-control mt-2" placeholder=" " />
-									<ValidationMessage For="(()=>Group.GroupName)"></ValidationMessage>
+									<ValidationMessage For="(()=>Group.GroupName)"/>
 								</div>
 
 								<label class="mt-2">
@@ -36,6 +37,7 @@
 										<option value="Account">Account</option>
 										<option value="Maid">Maid</option>
 									</InputSelect>
+									<ValidationMessage For="(()=>Group.Department)" />
 								</label>
 
 							</EditForm>
@@ -68,12 +70,7 @@
 	public List<User> ListUser = new List<User>();
 	private GroupMember Group = new();
 	private User? UserLogin = new();
-	public User NewUser;  //แปลง
 	public List<GroupMember> Test = new List<GroupMember>();
-	private void AddNewUser(User NewUser) //แปลง
-	{
-		var u = new User().ToTable(NewUser);
-	}
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -106,22 +103,50 @@
 	}
 	private void OnClickAddGroup()
 	{
+		string InputName = Group.GroupName;
+		string InputDepartment = Group.Department;
 		if (Group == null) return;
-		var AddGroup = new GroupMember().ToTable(Group);
-		groupMemberService.AddNewGroupMember(AddGroup); //บันทึกข้อมูล
+		if (Group.GroupName == null || Group.Department == null)
+		{
+			ShowNotificationErrorInput();
+			return;
+		}
+		if (InputName.Length < 3 || InputName.Length > 30)
+		{
+			ShowNotificationErrorInput();
+			return;
+		}
+		if (Group.GroupName != null || Group.Department != null)
+		{
+			var AddGroup = new GroupMember().ToTable(Group);
+			groupMemberService.AddNewGroupMember(AddGroup); //บันทึกข้อมูล
 
-		Group.GroupName = "";
-		Group.Department = "";
+			Group.GroupName = "";
+			Group.Department = "";
 
-		GroupMember CreateListGroup = new GroupMember()
+			GroupMember CreateListGroup = new GroupMember()
+				{
+					GroupID = AddGroup.GroupID,
+					GroupName = AddGroup.GroupName,
+					Department = AddGroup.Department,
+				};
+
+			GetAddGroupID.InvokeAsync(CreateListGroup);
+		}
+
+	}
+	private void ShowNotificationErrorInput()
+	{
+		var a = new NotificationMessage
 			{
-				GroupID = AddGroup.GroupID,
-				GroupName = AddGroup.GroupName,
-				Department = AddGroup.Department,
+				Severity = NotificationSeverity.Error,
+				Summary = "กรูณากรอกข้อมูลให้ถูกต้อง",
+				Detail = "",
+				Duration = 2700,
+				CloseOnClick = true,
+				Payload = DateTime.Now
 			};
-
-		GetAddGroupID.InvokeAsync(CreateListGroup);
-	
+		notificationservice.Notify(a);
 	}
 
 }

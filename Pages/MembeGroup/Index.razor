@@ -54,7 +54,7 @@
 									@if (UserLogin.Level == "admin")
 									{
 										<i class="fa-solid fa-trash bincolor" @onclick="()=>SentValue(Group)" data-bs-toggle="modal" data-bs-target="#ModalDelete"></i>
-										//	Modalยืนยันลบกลุ่ม
+						//	Modalยืนยันลบกลุ่ม
 										<div class="modal fade" id="ModalDelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog">
 												<div class="modal-content">
@@ -245,18 +245,47 @@
 
 	private void OnClickEditGroup()
 	{
-		@foreach (var Group in ListGroupMember.FindAll(e => e.GroupID == ValueGroup.GroupID))
+		string InputName = ValueGroup.GroupName;
+		string InputDepartment = ValueGroup.Department;
+		if (ValueGroup == null) return;
+		if (ValueGroup.GroupName == null || ValueGroup.Department == null)
 		{
-			Group.GroupName = ValueGroup.GroupName;
-			Group.Department = ValueGroup.Department;
-
-			var a = new GroupMember().ToTable(Group); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
-			groupMemberService.EditGroup(a); //บันทึกข้อมูล
-			ShowNotificationSuccessEdit();
-
+			ShowNotificationErrorInput();
+			return;
 		}
-		UserLogin.Department = UserLogin.Department;
-		UserLogin.Tel = UserLogin.Tel;
-		UserLogin.Password = UserLogin.Password;
+		if (InputName.Length < 3 || InputName.Length > 30)
+		{
+			ShowNotificationErrorInput();
+			return;
+		}
+		if (ValueGroup.GroupName != null || ValueGroup.Department != null)
+		{
+			@foreach (var Group in ListGroupMember.FindAll(e => e.GroupID == ValueGroup.GroupID))
+			{
+				Group.GroupName = ValueGroup.GroupName;
+				Group.Department = ValueGroup.Department;
+
+				var a = new GroupMember().ToTable(Group); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+				groupMemberService.EditGroup(a); //บันทึกข้อมูล
+				ShowNotificationSuccessEdit();
+
+			}
+			UserLogin.Department = UserLogin.Department;
+			UserLogin.Tel = UserLogin.Tel;
+			UserLogin.Password = UserLogin.Password;
+		}
+	}
+	private void ShowNotificationErrorInput()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Error,
+				Summary = "กรูณากรอกข้อมูลให้ถูกต้อง",
+				Detail = "",
+				Duration = 2700,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
 	}
 }

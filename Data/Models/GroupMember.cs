@@ -7,11 +7,12 @@ namespace CW_ordermedicine.Data.Models
 	public class GroupMember
 	{
 		public int GroupID { get; set; }
-
         [Required(ErrorMessage = "กรุณากรอกชื่อกลุ่ม")]
-        public string? GroupName { get; set; }
-        //[Required(ErrorMessage = "กรุณาเลือกแผนก")]
-        public string? Department { get; set; }
+		[MinLength(3, ErrorMessage = "ชื่อกลุ่มต้องมีตัวอักษรมากกว่า 3 ตัวอักษรขึ้นไป !")]
+		[MaxLength(30, ErrorMessage = "ชื่อกลุ่มต้องมีอักษรต่ำกว่า 30 ตัวอักษร !")]
+		public string? GroupName { get; set; }
+		[Required(ErrorMessage = "กรุณาเลือกแผนกกลุ่ม")]
+		public string? Department { get; set; }
         public int UserID { get; set; }
 
 		public GroupMember() { }
