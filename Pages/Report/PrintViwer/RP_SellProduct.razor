@@ -1,0 +1,44 @@
+﻿@page "/rp_SellProduct"
+@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject ProductService productService
+@inject CartProductService cartproductService
+@inject OrderService orderService
+
+
+@if (HeadTitle != "")
+{
+	<h1 style="text-align:center">@HeadTitle</h1>
+}
+
+<RadzenGrid AllowPaging="false" AllowFiltering="false"
+			PageSize="10" AllowSorting="false" Data="@ListProduct" TItem="Product" ColumnWidth="150px">
+	<Columns>
+			<RadzenGridColumn TItem="Product" Property="IDProduct" Title="IDProduct" Filterable="false"></RadzenGridColumn>
+			<RadzenGridColumn TItem="Product" Property="NameProduct" Title="NameProduct" Width="300px" Filterable="false"></RadzenGridColumn>
+			<RadzenGridColumn TItem="Product" Property="RemainderProduct" Title="RemainderProduct" Filterable="false"></RadzenGridColumn>
+			<RadzenGridColumn TItem="Product" Property="UnitProduct" Title="UnitProduct" Filterable="false"></RadzenGridColumn>
+			<RadzenGridColumn TItem="Product" Property="StorageProduct" Title="StorageProduct"Filterable="false"></RadzenGridColumn>			
+			<RadzenGridColumn TItem="Product" Property="PriceProduct" Title="PriceProduct" Filterable="false"></RadzenGridColumn>
+	</Columns>
+</RadzenGrid>
+
+@code {
+
+	private List<Product>? ListProduct = new List<Product>();
+	private List<CartProduct> ListCartProduct = new List<CartProduct>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		var Products = await productService.GetProductsAsync();
+		foreach (var Product in Products)
+		{
+			ListProduct.Add(new Product().ToUi(Product));
+		}
+	}
+}
+@code 
+{
+	[Parameter]
+	public string HeadTitle { get; set; }
+}

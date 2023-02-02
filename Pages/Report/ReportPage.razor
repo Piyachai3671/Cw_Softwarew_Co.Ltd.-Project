@@ -6,6 +6,7 @@
 @inject UserService userService
 @inject LoginService loginService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime js
 
 <div class="container-fluid">
 	<CW_ordermedicine.Pages.Report.Menu></CW_ordermedicine.Pages.Report.Menu>
@@ -17,27 +18,27 @@
 		}
 		else
 		{
-			<RadzenDataGrid FilterMode="FilterMode.SimpleWithMenu"
+			<RadzenDataGrid FilterMode="FilterMode.Simple"
 						AllowFiltering="true" AllowPaging="true" AllowSorting="true" AllowColumnResize="true"
-						PageSize="10" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
+						PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
 						FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-						LogicalFilterOperator="LogicalFilterOperator.Or" Style="z-index:0">
+						LogicalFilterOperator="LogicalFilterOperator.Or">
 
 				<Columns>
-					<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center">
+					@*1*@			<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center">
 						<Template Context="data">
 							<RadzenButton Click=@(args => OpenOrderBillPage(data.ReportID))
-									  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" />
+									  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" /> @*ปุ่มดูรายละเอียด*@
 						</Template>
 					</RadzenDataGridColumn>
 
 					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportID" Title="รหัสคำสั่งซื้อ" Filterable="true">
 					</RadzenDataGridColumn>
 
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
-									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
-									  FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
-									  LogicalFilterOperator="LogicalFilterOperator.Or">
+					@*2*@		<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
+												   Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+												   FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
+												   LogicalFilterOperator="LogicalFilterOperator.Or">
 
 						<FilterTemplate>
 							<RadzenDropDown @bind-Value=selectedUserName Style="width:100%;"
@@ -47,10 +48,10 @@
 
 					</RadzenDataGridColumn>
 
-					<RadzenDataGridColumn TItem="Report" Title="แผนก" Property="ReportDepartment"
-									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
-									  FilterValue="@selectedDepartment" FilterOperator="FilterOperator.Contains"
-									  LogicalFilterOperator="LogicalFilterOperator.Or">
+					@*3*@		<RadzenDataGridColumn TItem="Report" Title="แผนก" Property="ReportDepartment"
+												   Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+												   FilterValue="@selectedDepartment" FilterOperator="FilterOperator.Contains"
+												   LogicalFilterOperator="LogicalFilterOperator.Or">
 
 						<FilterTemplate>
 							<RadzenDropDown @bind-Value=@selectedDepartment Style="width:100%;"
@@ -58,6 +59,7 @@
 						</FilterTemplate>
 					</RadzenDataGridColumn>
 
+<<<<<<< HEAD
 					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ">
 						<Template Context="report">
 							@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", report.ReportPriceSum)
@@ -80,20 +82,23 @@
 							ราคารวม : <b>@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", ListReport.Sum(o => o.ReportPriceSum))</b> บาท
 						</FooterTemplate>
 					</RadzenDataGridColumn>
+=======
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ"></RadzenDataGridColumn>
+>>>>>>> 740e3d176a67e53c06ff9d3b2ab996361b581c30
 					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportDate" Title="วันเวลาทำรายการ" FormatString="{0:d}"></RadzenDataGridColumn>
 
 				</Columns>
+
 			</RadzenDataGrid>
 		}
 		<div class="position-sticky " style=" bottom:0px; text-align:end;  ">
-
 			<button class="btn btn-primary shadow mt-1 mb-2 me-3" style="border-radius:50%; font-size:30px; border:none;" data-bs-toggle="modal" data-bs-target="#FromAddMember">
-				<i class="fa-solid fa-print" style="font-size:30px;"></i>
+				<i @onclick="GoToReportViewer" class="fa-solid fa-print" style="font-size:30px;"></i>
 			</button>
-
 		</div>
 	</div>
 </div>
+
 
 
 @code {
@@ -132,5 +137,11 @@
 	private void OpenOrderBillPage(int SentOrderIDPage)
 	{
 		NavigationManager.NavigateTo($"/orderbill/{SentOrderIDPage}");
+	}
+}
+@code {
+	private void GoToReportViewer()
+	{
+		NavigationManager.NavigateTo($"/reportViewer/");
 	}
 }

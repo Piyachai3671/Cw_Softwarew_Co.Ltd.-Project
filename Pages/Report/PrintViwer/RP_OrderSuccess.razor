@@ -1,0 +1,124 @@
+﻿@page "/openordersuccess/{HeadTitle}"
+
+@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject ReportService reportService
+@inject UserService userService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime js
+
+@if (HeadTitle != "")
+{
+	<h1 style="text-align:center">@HeadTitle</h1>
+}
+<div class="container-fluid ">
+	
+	<div>
+		@if (ListReport == null)
+		{
+			<p>Loading </p>
+		}
+		else
+		{
+			<RadzenDataGrid FilterMode="FilterMode.Simple"
+						
+						PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
+						FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+						LogicalFilterOperator="LogicalFilterOperator.Or">
+
+				<Columns>
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportID" Title="รหัสคำสั่งซื้อ" Filterable="true">
+					</RadzenDataGridColumn>
+
+					@*2*@		<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
+												   Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+												   FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
+												   LogicalFilterOperator="LogicalFilterOperator.Or">
+
+									<FilterTemplate>
+										<RadzenDropDown @bind-Value=selectedUserName Style="width:100%;"
+													Data="@(ListUsers)" TextProperty="Name" ValueProperty="Name"
+													AllowFiltering="true" AllowClear="true" Multiple="true" />
+									</FilterTemplate>
+
+								</RadzenDataGridColumn>
+
+					@*3*@		<RadzenDataGridColumn TItem="Report" Title="แผนก" Property="ReportDepartment"
+												   Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+												   FilterValue="@selectedDepartment" FilterOperator="FilterOperator.Contains"
+												   LogicalFilterOperator="LogicalFilterOperator.Or">
+
+									<FilterTemplate>
+										<RadzenDropDown @bind-Value=@selectedDepartment Style="width:100%;"
+													Change=@OnSelectedDepartmentChange Data="@(Departments)" AllowClear="true" Multiple="true" />
+									</FilterTemplate>
+								</RadzenDataGridColumn>
+
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ"></RadzenDataGridColumn>
+
+					@*4*@
+					<RadzenDataGridColumn TItem="Report" Property="ReportDate" Title="วันเวลาทำรายการ"
+									  Type="typeof(IEnumerable<DateTime>)" TextAlign="TextAlign.Center"
+									  FilterValue="@selectedReportID" FilterOperator="FilterOperator.Contains"
+									  LogicalFilterOperator="LogicalFilterOperator.Or">
+
+						<FilterTemplate>
+							<RadzenDropDown @bind-Value=SelectedReportData Style="width:100%;"
+										Data="@(ListUsers)" TextProperty="Name" ValueProperty="Name"
+										AllowFiltering="true" AllowClear="true" Multiple="true" />
+						</FilterTemplate>
+
+					</RadzenDataGridColumn>
+				</Columns>
+			</RadzenDataGrid>
+		}
+		
+	</div>
+</div>
+
+
+@code {
+	private List<CW_ordermedicine.Data.Models.Report> ListReport = new List<CW_ordermedicine.Data.Models.Report>();
+	private List<User> ListUsers = new List<User>();
+	protected override async Task OnInitializedAsync()
+	{
+		var Reports = await reportService.GetReportsAsync();
+		foreach (var Report in Reports)
+		{
+			ListReport.Add(new Report().ToUi(Report));
+		}
+		var Users = await userService.GetUserAsync();
+		foreach (var User in Users)
+		{
+			ListUsers.Add(new User().ToUi(User));
+		}
+
+	}
+
+	IEnumerable<string> selectedDepartment;
+	List<string> Departments = new List<string> { "Software", "Account", "Maid" };
+	void OnSelectedDepartmentChange(object value)
+	{
+		if (selectedDepartment != null && !selectedDepartment.Any())
+		{
+			selectedDepartment = null;
+		}
+	}
+
+	IEnumerable<string> selectedUserName;
+	IEnumerable<int> selectedReportID;
+
+	/******************************************/
+	IEnumerable<DateTime> SelectedReportData;
+	/******************************************/
+	
+	
+	private void OpenOrderBillPage(int SentOrderIDPage)
+	{
+		NavigationManager.NavigateTo($"/orderbill/{SentOrderIDPage}");
+	}
+}
+@code{
+	[Parameter]
+	public string HeadTitle { get; set; }
+}
