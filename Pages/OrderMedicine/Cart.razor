@@ -378,6 +378,11 @@ else
 	}
 	private void OnSubmit()
 	{
+		if (ListCartProduct.Find(e=>e.Cartid == e.Cartid) == null)
+		{
+			ShowNotificationCartProductNull();
+			return;
+		}
 		CalculateRefresh();
 		@foreach (var IndexCartProduct in ListCartProduct)
 		{
@@ -511,6 +516,19 @@ else
 			{
 				Severity = NotificationSeverity.Error,
 				Summary = "มีบางอย่างผิดพลาด !",
+				Detail = "",
+				Duration = 5000,
+				CloseOnClick = true,
+				Payload = DateTime.Now
+			};
+		notificationservice.Notify(a);
+	}
+	private void ShowNotificationCartProductNull()
+	{
+		var a = new NotificationMessage
+			{
+				Severity = NotificationSeverity.Error,
+				Summary = "กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้น !",
 				Detail = "",
 				Duration = 5000,
 				CloseOnClick = true,
