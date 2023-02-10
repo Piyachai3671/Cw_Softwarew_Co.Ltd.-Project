@@ -18,15 +18,15 @@
 		}
 		else
 		{
-			<RadzenDataGrid FilterMode="FilterMode.Simple"
+			<RadzenDataGrid FilterMode="FilterMode.Simple" 
 						AllowFiltering="true" AllowPaging="true" AllowSorting="true" AllowColumnResize="true"
 						PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
 						FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
 						LogicalFilterOperator="LogicalFilterOperator.Or">
 
-				<Columns>
-					@*1*@			<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center">
-						<Template Context="data">
+				<Columns >
+					<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center" >
+						<Template  Context="data">
 							<RadzenButton Click=@(args => OpenOrderBillPage(data.ReportID))
 									  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" /> @*ปุ่มดูรายละเอียด*@
 						</Template>
@@ -35,10 +35,10 @@
 					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportID" Title="รหัสคำสั่งซื้อ" Filterable="true">
 					</RadzenDataGridColumn>
 
-					@*2*@		<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
-												   Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
-												   FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
-												   LogicalFilterOperator="LogicalFilterOperator.Or">
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
+									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+									  FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
+									  LogicalFilterOperator="LogicalFilterOperator.Or">
 
 						<FilterTemplate>
 							<RadzenDropDown @bind-Value=selectedUserName Style="width:100%;"
@@ -48,10 +48,10 @@
 
 					</RadzenDataGridColumn>
 
-					@*3*@		<RadzenDataGridColumn TItem="Report" Title="แผนก" Property="ReportDepartment"
-												   Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
-												   FilterValue="@selectedDepartment" FilterOperator="FilterOperator.Contains"
-												   LogicalFilterOperator="LogicalFilterOperator.Or">
+					<RadzenDataGridColumn TItem="Report" Title="แผนก" Property="ReportDepartment"
+									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+									  FilterValue="@selectedDepartment" FilterOperator="FilterOperator.Contains"
+									  LogicalFilterOperator="LogicalFilterOperator.Or">
 
 						<FilterTemplate>
 							<RadzenDropDown @bind-Value=@selectedDepartment Style="width:100%;"
@@ -65,19 +65,19 @@
 						</Template>
 						<FooterTemplate>
 							@*@{
-								var FinancialStructureValuseEur = this.ListReport.Sum(i => i.ReportPriceSum);
-							}
-							<b>
-								<span class="mathsign">&sum;</span> @String.Format("{0:THB #,##0.00}",FinancialStructureValuseEur)
-							</b>*@
-							
+						var FinancialStructureValuseEur = this.ListReport.Sum(i => i.ReportPriceSum);
+						}
+						<b>
+						<span class="mathsign">&sum;</span> @String.Format("{0:THB #,##0.00}",FinancialStructureValuseEur)
+						</b>*@
+
 							@*@if (CreateToVar == "")//มันสร้างvarได้แค่ภายในIFเลยต้องIFว่างๆมา//วิธีสำหรับให้เห็นราคารวมของแต่ละร้านค้า
-							{
-								var Report = ListReport.FindAll(e => e.ReportUserID == UserLogin.UserID);
-								@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}",
+						{
+						var Report = ListReport.FindAll(e => e.ReportUserID == UserLogin.UserID);
+						@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}",
 						Report.Sum(e=>e.ReportPriceSum)
 						)
-							}*@
+						}*@
 							ราคารวม : <b>@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", ListReport.Sum(o => o.ReportPriceSum))</b> บาท
 						</FooterTemplate>
 					</RadzenDataGridColumn>

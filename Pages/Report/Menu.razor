@@ -1,70 +1,57 @@
 ﻿@page "/report-index"
+@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject GroupMemberService groupMemberService
+@inject UserService userService
+@inject OrderService orderService
+
 
 <div class="row">
 	<div class="col-lg-3">
-		<div class="mb-3" style="border-radius:10px; border:solid; border-color:#ddd; max-width: 18rem; background: #ffffff;cursor:pointer;">
-			<div class="card-body">
-				<div class="row">
-					<div class="d-flex justify-content-between p-2">
-						<h4 class="card-title" style="color:#6699FF;">
-							Group : 30 
-						</h4>
-						<h5 class="card-title"><i class="fa-solid fa-users"></i></h5>
+		<a href="member-group" style="text-decoration:none;">
+			<div class="mb-3" style="border-radius:10px; border:solid; border-color:#ddd; max-width: 18rem; background: #ffffff;cursor:pointer;">
+				<div class="card-body">
+					<div class="row">
+						<div class="d-flex justify-content-between p-2">
+							<h4 class="card-title" style="color:#6699FF;">
+								กลุ่มทั้งหมด : @ListGroupMember.Count()
+							</h4>
+							<h5 class="card-title"><i class="fa-solid fa-users"></i></h5>
+						</div>
+						<h6 style="color:#919AA3"> จำนวนสมาชิก : @ListUsers.Count()</h6>
 					</div>
-					<h6 style="color:#919AA3"> Sum people : 180</h6>
 				</div>
-			</div>
 
-			<div class="card-footer" style="background:linear-gradient( 90deg,#8BD2EC,#92CEA8, #FCEE9E,#FFF3D7); color:#ffffff">
-				<div class="d-flex justify-content-between p-2">
-					<div>Click</div>
-					<div class=" fa-solid fa-arrow-pointer" style="color:#6699FF;"></div>
-				</div>		
-			</div>
-		</div>
-	</div>
-	
-	<div class="col-lg-3">
-		<div class="mb-3" style="border-radius:10px; border:solid; border-color:#ddd; max-width: 18rem; background: #ffffff;">
-			<div class="card-body">
-				<div class="row">
+				<div class="card-footer" style="background:linear-gradient( 90deg,#8BD2EC,#92CEA8, #FCEE9E,#FFF3D7); color:#ffffff">
 					<div class="d-flex justify-content-between p-2">
-						<h4 class="card-title" style="color:#FE9365;">
-							$30200
-						</h4>
-						<h5 class="card-title"><i class="fa-solid fa-chart-simple"></i></h5>
+						<div>Click</div>
+						<div class=" fa-solid fa-arrow-pointer" style="color:#6699FF;"></div>
 					</div>
-					<h6 style="color:#919AA3"> All Earnings</h6>
 				</div>
 			</div>
-
-			<div class="card-footer" style="background: linear-gradient( 90deg,#ffb97a,#f5bf8e,#f5bf8e, #fde8ba,#fef0d2); color:#ffffff">
-				<div class="d-flex justify-content-between p-2">
-					<div>% change</div>
-					<div class="fa-solid fa-arrow-trend-down"></div>
-				</div>
-			</div>
-		</div>
+		</a>
 	</div>
+
+
 
 	<div class="col-lg-3">
 		<div class="mb-3" style="border-radius:10px; border:solid; border-color:#ddd; max-width: 18rem; background: #ffffff;">
 			<div class="card-body">
 				<div class="row">
 					<div class="d-flex justify-content-between p-2">
-						<h4 class="card-title" style="color:#FE9365;">
-							$30200
+						<h4 class="card-title" style="color:#F96464;">
+							คำสั่งซื้อที่ยกเลิก : @ListOrders.FindAll(e=>e.OrderStatus == "Cancel").Count()
 						</h4>
 						<h5 class="card-title"><i class="fa-solid fa-chart-simple"></i></h5>
 					</div>
-					<h6 style="color:#919AA3"> All Earnings</h6>
+					<h6 style="color:#919AA3">คำสั่งซื้อทั้งหมด : @ListOrders.Count()</h6>
 				</div>
 			</div>
 
-			<div class="card-footer" style="background: linear-gradient( 90deg,#ffb97a,#f5bf8e,#f5bf8e, #fde8ba,#fef0d2); color:#ffffff">
+			<div class="card-footer" style="background-color:#F96464;">
 				<div class="d-flex justify-content-between p-2">
-					<div>% change</div>
-					<div class="fa-solid fa-arrow-trend-down"></div>
+					<div>ราคารวม :  @ListOrders.FindAll(e=>e.OrderStatus == "Cancel").Sum(e=>e.OrderSumPrice)</div> บาท
+					
 				</div>
 			</div>
 		</div>
@@ -75,19 +62,42 @@
 			<div class="card-body">
 				<div class="row">
 					<div class="d-flex justify-content-between p-2">
-						<h4 class="card-title" style="color:#FE9365;">
-							$30200
+						<h4 class="card-title" style="color:lightgreen;">
+							คำสั่งซื้อที่สำเร็จ : @ListOrders.FindAll(e=>e.OrderStatus =="Success").Count()
 						</h4>
 						<h5 class="card-title"><i class="fa-solid fa-chart-simple"></i></h5>
 					</div>
-					<h6 style="color:#919AA3"> All Earnings</h6>
+					<h6 style="color:#919AA3">คำสั่งซื้อทั้งหมด : @ListOrders.Count()</h6>
 				</div>
 			</div>
 
-			<div class="card-footer" style="background: linear-gradient( 90deg,#ffb97a,#f5bf8e,#f5bf8e, #fde8ba,#fef0d2); color:#ffffff">
+			<div class="card-footer" style="background-color: lightgreen;">
 				<div class="d-flex justify-content-between p-2">
-					<div>% change</div>
-					<div class="fa-solid fa-arrow-trend-down"></div>
+					<div>ราคารวม : @ListOrders.FindAll(e=>e.OrderStatus == "Success").Sum(e=>e.OrderSumPrice)</div> บาท
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-3">
+		<div class="mb-3" style="border-radius:10px; border:solid; border-color:#ddd; max-width: 18rem; background: #ffffff;">
+			<div class="card-body">
+				<div class="row">
+					<div class="d-flex justify-content-between p-2">
+						<h4 class="card-title" style="color:coral;">
+							คำสั่งซื้อที่สำเร็จ : @ListOrders.FindAll(e=>e.OrderStatus =="PreOrder").Count()
+						</h4>
+						<h5 class="card-title"><i class="fa-solid fa-chart-simple"></i></h5>
+					</div>
+					<h6 style="color:#919AA3">คำสั่งซื้อทั้งหมด : @ListOrders.Count()</h6>
+				</div>
+			</div>
+
+			<div class="card-footer" style="background-color :coral">
+				<div class="d-flex justify-content-between p-2">			
+						<div>ราคารวม : @ListOrders.FindAll(e=>e.OrderStatus == "PreOrder").Sum(e=>e.OrderSumPrice)</div> บาท
+					
 				</div>
 			</div>
 		</div>
@@ -96,5 +106,27 @@
 
 
 @code {
+	private List<GroupMember> ListGroupMember = new List<GroupMember>();
+	private List<Order> ListOrders = new List<Order>();
+	private List<User> ListUsers = new List<User>();
 
+	protected override async Task OnInitializedAsync()
+	{
+		//ListGroupMember = await groupMemberService.GetGroupAsync();
+		var Groups = await groupMemberService.GetGroupAsync();
+		foreach (var Group in Groups)
+		{
+			ListGroupMember.Add(new GroupMember().ToUi(Group));
+		}
+		var Users = await userService.GetUserAsync();
+		foreach (var User in Users)
+		{
+			ListUsers.Add(new User().ToUi(User));
+		}
+		var Orders = await orderService.GetOrderAsync();
+		foreach (var Order in Orders)
+		{
+			ListOrders.Add(new Order().ToUi(Order));
+		}
+	}
 }
