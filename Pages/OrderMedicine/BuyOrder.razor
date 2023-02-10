@@ -71,7 +71,15 @@
 				<RadzenGridColumn TItem="Product" Property="PriceProduct" Title="PriceProduct" Filterable="false"></RadzenGridColumn>
 				<RadzenGridColumn TItem="Product">
 					<Template Context="data">
-						<RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="add_shopping_cart" Class="m-1" Click=@(args => SelectProduct(data)) />
+						@if (data.RemainderProduct == 0)
+						{
+							<RadzenButton ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="add_shopping_cart" Class="m-1" Disabled />
+						}
+						@if (data.RemainderProduct > 0)
+						{
+							<RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="add_shopping_cart" Class="m-1" Click=@(args => SelectProduct(data)) />
+						}
+						
 					</Template>
 				</RadzenGridColumn>
 

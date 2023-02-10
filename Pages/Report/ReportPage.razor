@@ -22,7 +22,10 @@
 						AllowFiltering="true" AllowPaging="true" AllowSorting="true" AllowColumnResize="true"
 						PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
 						FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-						LogicalFilterOperator="LogicalFilterOperator.Or">
+						LogicalFilterOperator="LogicalFilterOperator.Or" style="--rz-grid-header-background-color:;
+						--rz-grid-hover-background-color: blue;
+						--rz-grid-hover-color: red;
+						--rz-grid-cell-color: grey;"> 
 
 				<Columns >
 					<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center" >
@@ -35,7 +38,7 @@
 					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportID" Title="รหัสคำสั่งซื้อ" Filterable="true">
 					</RadzenDataGridColumn>
 
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ" 
 									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
 									  FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
 									  LogicalFilterOperator="LogicalFilterOperator.Or">
@@ -59,7 +62,7 @@
 						</FilterTemplate>
 					</RadzenDataGridColumn>
 
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ">
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ" >
 						<Template Context="report">
 							@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", report.ReportPriceSum)
 						</Template>
