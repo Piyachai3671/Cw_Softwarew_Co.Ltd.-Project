@@ -40,11 +40,8 @@
 								<div style="color:black;">
 									<strong class="" style="font-size:24px;"> ชื่อกลุ่ม : @Group.GroupName</strong>
 									<div class="mt-2" style="font-size:18px;">แผนก @Group.Department</div>
-
-
 									<button class="btn btn-link" @onclick="()=>OpenGroupInMemberPage(Group.GroupID)">
-
-										<p>ดูสมาชิกทั้งหมด</p>
+										<p>ดูสมาชิกทั้งหมด : @ListUser.FindAll(e => e.GroupID == Group.GroupID).Count()</p> 
 									</button>
 
 

@@ -83,7 +83,7 @@
 									<div class="d-flex flex-row align-items-center mb-4">
 										<i class="fa-solid fa-phone fa-lg me-3 fa-fw"></i>
 										<div class="form-outline flex-fill mb-0">
-											<InputText @bind-Value="@UserLogin.Tel" type="text" class="form-control" />
+											<InputText @bind-Value="@UserLogin.Tel" type="text" class="form-control" maxlength="10" />
 											<ValidationMessage For="@(()=>UserLogin.Tel)" />
 											<label class="form-label" for="form3Example3c">เบอร์โทร</label>
 										</div>
