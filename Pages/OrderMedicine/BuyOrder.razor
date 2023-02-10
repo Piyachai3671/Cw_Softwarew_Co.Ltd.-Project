@@ -6,6 +6,7 @@
 @inject OrderService orderService
 @inject NotificationService notificationservice
 <HeadBill></HeadBill>
+
 <div class="container-fluid">
 
 	<div class="mt-3 position-sticky" style="bottom:0px; text-align:end;">
@@ -91,6 +92,7 @@
 
 	}
 </div>
+
 @code {
 
 	private List<Product> ListProduct = new List<Product>();
@@ -115,9 +117,9 @@
 		}
 	}
 
-	public void SelectProduct(Product eleproduct)
+	public async void SelectProduct(Product eleproduct)
 	{
-
+		ListCartProduct = await cartproductService.GetCartProductsAsync();
 		//int IDCartCount = ListCartProduct;
 
 		var a = ListCartProduct.Find(e => e.NameProduct == eleproduct.NameProduct); //ชื่อสินค้าในตระกร้า กับ ชื่อสินค้าในคลังถ้ามีอยู่ในตระกร้าซ้ำจะเพิ่มแค่จำนวนไม่เพิ่มสินค้า

@@ -12,7 +12,7 @@
 	<h1 style="text-align:center">@HeadTitle</h1>
 }
 <div class="container-fluid ">
-	
+
 	<div>
 		@if (ListReport == null)
 		{
@@ -21,64 +21,58 @@
 		else
 		{
 			<RadzenDataGrid FilterMode="FilterMode.Simple"
-						
+						AllowFiltering="true" AllowPaging="true" AllowSorting="true" AllowColumnResize="true"
 						PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
 						FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
 						LogicalFilterOperator="LogicalFilterOperator.Or">
 
 				<Columns>
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportID" Title="รหัสคำสั่งซื้อ" Filterable="true">
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportID" Title="รหัสคำสั่งซื้อ" Filterable="false"TextAlign="TextAlign.Center">
 					</RadzenDataGridColumn>
 
-					@*2*@		<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
-												   Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
-												   FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
-												   LogicalFilterOperator="LogicalFilterOperator.Or">
-
-									<FilterTemplate>
-										<RadzenDropDown @bind-Value=selectedUserName Style="width:100%;"
-													Data="@(ListUsers)" TextProperty="Name" ValueProperty="Name"
-													AllowFiltering="true" AllowClear="true" Multiple="true" />
-									</FilterTemplate>
-
-								</RadzenDataGridColumn>
-
-					@*3*@		<RadzenDataGridColumn TItem="Report" Title="แผนก" Property="ReportDepartment"
-												   Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
-												   FilterValue="@selectedDepartment" FilterOperator="FilterOperator.Contains"
-												   LogicalFilterOperator="LogicalFilterOperator.Or">
-
-									<FilterTemplate>
-										<RadzenDropDown @bind-Value=@selectedDepartment Style="width:100%;"
-													Change=@OnSelectedDepartmentChange Data="@(Departments)" AllowClear="true" Multiple="true" />
-									</FilterTemplate>
-								</RadzenDataGridColumn>
-
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ"></RadzenDataGridColumn>
-
-					@*4*@
-					<RadzenDataGridColumn TItem="Report" Property="ReportDate" Title="วันเวลาทำรายการ"
-									  Type="typeof(IEnumerable<DateTime>)" TextAlign="TextAlign.Center"
-									  FilterValue="@selectedReportID" FilterOperator="FilterOperator.Contains"
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
+									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+									  FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
 									  LogicalFilterOperator="LogicalFilterOperator.Or">
 
 						<FilterTemplate>
-							<RadzenDropDown @bind-Value=SelectedReportData Style="width:100%;"
+							<RadzenDropDown @bind-Value=selectedUserName Style="width:100%;"
 										Data="@(ListUsers)" TextProperty="Name" ValueProperty="Name"
 										AllowFiltering="true" AllowClear="true" Multiple="true" />
 						</FilterTemplate>
 
 					</RadzenDataGridColumn>
+
+					<RadzenDataGridColumn TItem="Report" Title="แผนก" Property="ReportDepartment" 
+									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+									  FilterValue="@selectedDepartment" FilterOperator="FilterOperator.Contains"
+									  LogicalFilterOperator="LogicalFilterOperator.Or" Filterable="true">
+
+						<FilterTemplate>
+							<RadzenDropDown @bind-Value=@selectedDepartment Style="width:100%;"
+										Change=@OnSelectedDepartmentChange Data="@(Departments)" AllowClear="true" Multiple="true"  />
+						</FilterTemplate>
+					</RadzenDataGridColumn>
+
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ" TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+
+
+					<RadzenDataGridColumn TItem="Report" Property="ReportDate" Title="วันเวลาทำรายการ" FormatString="{0:d}" TextAlign="TextAlign.Center">
+									 @* Type="typeof(IEnumerable<DateTime>)" TextAlign="TextAlign.Center"
+									  FilterValue="@selectedReportID" FilterOperator="FilterOperator.Contains"
+									  LogicalFilterOperator="LogicalFilterOperator.Or">*@
+
+					</RadzenDataGridColumn>
 				</Columns>
 			</RadzenDataGrid>
 		}
-		
+
 	</div>
 </div>
 
 
 @code {
-	private List<CW_ordermedicine.Data.Models.Report> ListReport = new List<CW_ordermedicine.Data.Models.Report>();
+	private List<Report> ListReport = new List<Report>();
 	private List<User> ListUsers = new List<User>();
 	protected override async Task OnInitializedAsync()
 	{
@@ -111,14 +105,9 @@
 	/******************************************/
 	IEnumerable<DateTime> SelectedReportData;
 	/******************************************/
-	
-	
-	private void OpenOrderBillPage(int SentOrderIDPage)
-	{
-		NavigationManager.NavigateTo($"/orderbill/{SentOrderIDPage}");
-	}
+
 }
-@code{
+@code {
 	[Parameter]
 	public string HeadTitle { get; set; }
 }
