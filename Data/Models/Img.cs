@@ -7,7 +7,7 @@ namespace CW_ordermedicine.Data.Models
 		public int Imgid { get; set; }
 		public string? Imgname { get; set; }
 		public string? path { get; set; }
-
+		
 		public Img()
 		{ }
 		public Img ToUi(TableImg tableImg) //UI ไปเทเบิล
@@ -18,6 +18,7 @@ namespace CW_ordermedicine.Data.Models
 				Imgid = tableImg.Imgid,
 				Imgname = tableImg.Imgname,
 				path = tableImg.path,
+				
 			};
 		}
 
@@ -28,6 +29,7 @@ namespace CW_ordermedicine.Data.Models
 				Imgid = NewImg.Imgid,
 				Imgname = NewImg.Imgname,
 				path = NewImg.path,
+				
 			};
 		}
 

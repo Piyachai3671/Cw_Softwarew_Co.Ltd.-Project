@@ -10,6 +10,6 @@ namespace CW_ordermedicine.Data.ModelData
 		public int Imgid { get; set; }
 		public string? Imgname { get; set; }
 		public string? path { get; set; }
-
+		
 	}
 }
