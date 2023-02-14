@@ -105,7 +105,7 @@
 				<table class="table">
 					<thead>
 						<tr>
-
+							<th scope="col">รายละเอียดเพิ่มเติม</th>
 							<th scope="col">รหัสคำสั่งซื้อ</th>
 							<th scope="col">ชื่อผู้ทำรายการ</th>
 							<th scope="col">แผนก</th>
@@ -118,6 +118,11 @@
 						@foreach (var Report in ListReport.Where(s => s.ReportStatus == "Success" && s.ReportCheck == true && s.ReportDepartment.ToUpper().Contains(SearchWord.ToUpper())))
 						{
 							<tr>
+								<td>
+									<button class="btn btn-link" @onclick="()=>OpenOrderBillPage(Report.ReportID)">
+										ดูเพิ่มเติม
+									</button>
+								</td>
 								<td>@Report.ReportID</td>
 								<td>@Report.ReportUserName</td>
 								<td>@Report.ReportDepartment</td>
@@ -131,8 +136,8 @@
 						<tr>
 							<td>จำนวนคำสั่งซื้อ : @ListReport.FindAll(e=>e.ReportCheck == true).Count() รายการ</td>
 							<td></td>
-							<td>ราคาทั้งหมด : @SumPriceCheck บาท</td>
 							<td></td>
+							<td>ราคาทั้งหมด : @SumPriceCheck บาท</td>
 							<td></td>
 							<td>
 							</td>
@@ -261,6 +266,7 @@
 		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
 		options = ListReport.Select(f => f.ReportDepartment).Distinct().ToList();
 		optionsDate = ListReport.Select(o => o.ReportDate).Distinct().ToList();
+		SaveSumPrice();	
 	}
 
 	IEnumerable<string> selectedDepartment;
@@ -297,8 +303,6 @@
 	double SumPriceCheck = 0.0;
 	private void OnSum(Report ID)
 	{
-
-
 		price = 0;
 		SumPrice = ID;
 		price = price + ID.ReportPriceSum ?? 0.0;
@@ -317,7 +321,8 @@
 			{
 				SumPriceCheck = SumPriceCheck - Report.ReportPriceSum ?? 0.0;
 			}
-
+			var a = new Report().ToTable(Report); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+			reportService.EditReport(a); //บันทึกข้อมูล
 		}
 
 
@@ -338,6 +343,8 @@
 				{
 					SumPriceCheck = SumPriceCheck + Report.ReportPriceSum ?? 0.0;
 				}
+				var ReportE = new Report().ToTable(Report); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+				reportService.EditReport(ReportE); //บันทึกข้อมูล
 			}
 		}
 		if (CheckAll == false)
@@ -349,9 +356,21 @@
 				{
 					SumPriceCheck = 0.0;
 				}
+				var ReportE = new Report().ToTable(Report); //นำค่ามาเก็บใน a แต่ยังไม่บันทึกข้อมูล
+				reportService.EditReport(ReportE); //บันทึกข้อมูล
+			}
+		}
+	}
+	private void SaveSumPrice()
+	{
+		foreach (var Report in ListReport.FindAll(e => e.ReportStatus == "Success"))
+		{
+			if (Report.ReportCheck == true)
+			{
+				SumPriceCheck = SumPriceCheck + Report.ReportPriceSum ?? 0.0;
 			}
 		}
 
-
 	}
 }
+

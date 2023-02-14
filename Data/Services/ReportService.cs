@@ -37,7 +37,7 @@ namespace CW_ordermedicine.Data.Services
 			FindID.ReportDate = EditReport.ReportDate;
 			FindID.ReportStatus= EditReport.ReportStatus;
 			FindID.ReportPriceSum = EditReport.ReportPriceSum;
-
+			FindID.ReportCheck = EditReport.ReportCheck;
 
 			_Context.TableReport.Update(FindID);
 			_Context.SaveChanges();//บันทึกลง SQL
