@@ -12,24 +12,156 @@
 	<CW_ordermedicine.Pages.Report.Menu></CW_ordermedicine.Pages.Report.Menu>
 	<CW_ordermedicine.Pages.Report.Progress></CW_ordermedicine.Pages.Report.Progress>
 	<div>
+		@*<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Placeholder</RadzenText>
+		<RadzenTextBox Placeholder="Search..." Change=@(args => Search()) class="w-100" />*@
+
+		<div class="card mt-3 mb-3">
+			<div class="card-header" style="text-align:center;">
+				<h1>ค้นหารายงาน</h1>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-lg-1">
+						<div class="form-check mb-3 mt-0">
+							<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" @onclick="OnCheckAll">
+							<label class="form-check-label" for="flexCheckDefault">
+								เลือกทั้งหมด
+							</label>
+						</div>
+					</div>
+
+					<div class="col">
+						<div class="search-container">
+							<div>
+								<label>แผนก : </label>
+								<input type="text" placeholder="Search.." name="" @bind="SearchWord" @bind:event="oninput" />
+							</div>
+						</div>
+					</div>
+					@*<div class="col">
+					<div class="search-container">
+					<div>
+					<label>วันที่ : </label>
+					<input type="date" placeholder="Search.." name="" @bind="SearchDate" @bind:event="oninputDate"/>
+					</div>
+					</div>
+					</div>*@
+				</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col"></th>
+							<th scope="col">รหัสคำสั่งซื้อ</th>
+							<th scope="col">ชื่อผู้ทำรายการ</th>
+							<th scope="col">แผนก</th>
+							<th scope="col">ราคาสุทธิ</th>
+							<th scope="col">วันเวลาทำรายการ</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						@foreach (var Report in ListReport.Where(s => s.ReportStatus == "Success" &&
+								s.ReportDepartment.ToUpper().Contains(SearchWord.ToUpper()
+
+								)))
+						{
+							<tr>
+								<th scope="">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" @bind="Report.ReportCheck" @onclick="()=>OnSum(Report)">
+										<label class="form-check-label" for="flexCheckDefault">
+										</label>
+									</div>
+								</th>
+								<td>@Report.ReportID</td>
+								<td>@Report.ReportUserName</td>
+								<td>@Report.ReportDepartment</td>
+								<td>@Report.ReportPriceSum</td>
+								<td>@Report.ReportDate</td>
+							</tr>
+						}
+
+					</tbody>
+					<tfoot style="text-align:center">
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td>ราคาทั้งหมด : @ListReport.Sum(e=>e.ReportPriceSum) บาท</td>
+							<td>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		</div>
+		@*//////////////////////////////////////*@
+		<div class="card mt-3 mb-3">
+			<div class="card-header" style="text-align:center;">
+				<h1>รายงานที่เลือก</h1>
+			</div>
+			<div class="card-body">
+				<table class="table">
+					<thead>
+						<tr>
+
+							<th scope="col">รหัสคำสั่งซื้อ</th>
+							<th scope="col">ชื่อผู้ทำรายการ</th>
+							<th scope="col">แผนก</th>
+							<th scope="col">ราคาสุทธิ</th>
+							<th scope="col">วันเวลาทำรายการ</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						@foreach (var Report in ListReport.Where(s => s.ReportStatus == "Success" && s.ReportCheck == true && s.ReportDepartment.ToUpper().Contains(SearchWord.ToUpper())))
+						{
+							<tr>
+								<td>@Report.ReportID</td>
+								<td>@Report.ReportUserName</td>
+								<td>@Report.ReportDepartment</td>
+								<td>@Report.ReportPriceSum</td>
+								<td>@Report.ReportDate</td>
+							</tr>
+						}
+
+					</tbody>
+					<tfoot style="text-align:center">
+						<tr>
+							<td>จำนวนคำสั่งซื้อ : @ListReport.FindAll(e=>e.ReportCheck == true).Count() รายการ</td>
+							<td></td>
+							<td>ราคาทั้งหมด : @SumPriceCheck บาท</td>
+							<td></td>
+							<td></td>
+							<td>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		</div>
+
+
+
 		@if (ListReport == null)
 		{
 			<p>Loading </p>
 		}
 		else
 		{
-			<RadzenDataGrid FilterMode="FilterMode.Simple" 
+			<RadzenDataGrid FilterMode="FilterMode.Simple"
 						AllowFiltering="true" AllowPaging="true" AllowSorting="true" AllowColumnResize="true"
 						PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
 						FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
 						LogicalFilterOperator="LogicalFilterOperator.Or" style="--rz-grid-header-background-color:;
 						--rz-grid-hover-background-color: blue;
 						--rz-grid-hover-color: red;
-						--rz-grid-cell-color: grey;"> 
+						--rz-grid-cell-color: grey;">
 
-				<Columns >
-					<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center" >
-						<Template  Context="data">
+				<Columns>
+					<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center">
+						<Template Context="data">
 							<RadzenButton Click=@(args => OpenOrderBillPage(data.ReportID))
 									  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" /> @*ปุ่มดูรายละเอียด*@
 						</Template>
@@ -38,7 +170,7 @@
 					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportID" Title="รหัสคำสั่งซื้อ" Filterable="true">
 					</RadzenDataGridColumn>
 
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ" 
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
 									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
 									  FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
 									  LogicalFilterOperator="LogicalFilterOperator.Or">
@@ -62,10 +194,10 @@
 						</FilterTemplate>
 					</RadzenDataGridColumn>
 
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ" >
-						<Template Context="report">
-							@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", report.ReportPriceSum)
-						</Template>
+					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ">
+						@*<Template Context="report">
+					@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", report.ReportPriceSum)
+					</Template>*@
 						<FooterTemplate>
 							@*@{
 						var FinancialStructureValuseEur = this.ListReport.Sum(i => i.ReportPriceSum);
@@ -108,6 +240,12 @@
 	private List<User> ListUsers = new List<User>();
 	private User UserLogin = new();
 	private string CreateToVar = "";
+	public string SearchWord { get; set; } = string.Empty;
+	List<string> options;
+	public DateTime SearchDate { get; set; } = DateTime.Today;
+	List<DateTime> optionsDate;
+	private Report CheckBox = new();
+	private bool status = true;
 	protected override async Task OnInitializedAsync()
 	{
 		var Reports = await reportService.GetReportsAsync();
@@ -121,6 +259,8 @@
 			ListUsers.Add(new User().ToUi(User));
 		}
 		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+		options = ListReport.Select(f => f.ReportDepartment).Distinct().ToList();
+		optionsDate = ListReport.Select(o => o.ReportDate).Distinct().ToList();
 	}
 
 	IEnumerable<string> selectedDepartment;
@@ -140,10 +280,78 @@
 	{
 		NavigationManager.NavigateTo($"/orderbill/{SentOrderIDPage}");
 	}
-}
-@code {
+
 	private void GoToReportViewer()
 	{
 		NavigationManager.NavigateTo($"/reportViewer/");
+	}
+
+
+	private void Search(Report Name)
+	{
+		string word = "";
+
+	}
+	private Report SumPrice = new();
+	private double price;
+	double SumPriceCheck = 0.0;
+	private void OnSum(Report ID)
+	{
+
+
+		price = 0;
+		SumPrice = ID;
+		price = price + ID.ReportPriceSum ?? 0.0;
+		foreach (var Report in ListReport.FindAll(e => e.ReportStatus == "Success" && e.ReportID == ID.ReportID))
+		{
+			if (Report.ReportCheck == null)
+			{
+				Report.ReportCheck = false;
+			}
+			Report.ReportCheck = !Report.ReportCheck;
+			if (Report.ReportCheck == true)
+			{
+				SumPriceCheck = SumPriceCheck + Report.ReportPriceSum ?? 0.0;
+			}
+			if (Report.ReportCheck == false)
+			{
+				SumPriceCheck = SumPriceCheck - Report.ReportPriceSum ?? 0.0;
+			}
+
+		}
+
+
+
+	}
+
+	private bool CheckAll = false;
+	private void OnCheckAll()
+	{
+		SumPriceCheck = 0.0;
+		CheckAll = !CheckAll;
+		if (CheckAll == true)
+		{
+			foreach (var Report in ListReport.FindAll(e => e.ReportStatus == "Success"))
+			{
+				Report.ReportCheck = true;
+				if (Report.ReportCheck == true)
+				{
+					SumPriceCheck = SumPriceCheck + Report.ReportPriceSum ?? 0.0;
+				}
+			}
+		}
+		if (CheckAll == false)
+		{
+			foreach (var Report in ListReport.FindAll(e => e.ReportStatus == "Success"))
+			{
+				Report.ReportCheck = false;
+				if (Report.ReportCheck == false)
+				{
+					SumPriceCheck = 0.0;
+				}
+			}
+		}
+
+
 	}
 }

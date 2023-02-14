@@ -16,6 +16,7 @@ namespace CW_ordermedicine.Data.Models
 		public string? ReportDepartment { get; set; }
 		public double? ReportPriceSum { get; set; }
 		public string? ReportStatus { get; set; }
+		public bool? ReportCheck { get; set; }
 		public DateTime ReportDate { get; set; }
 
 		public Report() { }
@@ -35,6 +36,7 @@ namespace CW_ordermedicine.Data.Models
 				ReportPriceSum = tableReport.ReportPriceSum,
 				ReportDate = tableReport.ReportDate,
 				ReportStatus = tableReport.ReportStatus,
+				ReportCheck = tableReport.ReportCheck,
 			};
 
 		}
@@ -53,6 +55,7 @@ namespace CW_ordermedicine.Data.Models
 				ReportPriceSum = NewReport.ReportPriceSum,
 				ReportDate = NewReport.ReportDate,
 				ReportStatus = NewReport.ReportStatus,
+				ReportCheck = NewReport.ReportCheck,
 			};
 		}
 	}

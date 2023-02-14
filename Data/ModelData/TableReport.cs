@@ -18,5 +18,6 @@ namespace CW_ordermedicine.Data.ModelData
 		public double? ReportPriceSum { get; set; }
 		public DateTime ReportDate { get; set; }
 		public string? ReportStatus { get; set; }
+		public bool? ReportCheck { get; set; }
 	}
 }
