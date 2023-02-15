@@ -15,7 +15,7 @@
 		@*<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Placeholder</RadzenText>
 		<RadzenTextBox Placeholder="Search..." Change=@(args => Search()) class="w-100" />*@
 
-		<div class="card mt-3 mb-3">
+		<!--<div class="card mt-3 mb-3">
 			<div class="card-header" style="text-align:center;">
 				<h1>ค้นหารายงาน</h1>
 			</div>
@@ -38,6 +38,15 @@
 							</div>
 						</div>
 					</div>
+
+					<div class="col">
+						<div class="search-container">
+							<div>
+								<label>รายชื่อ : </label>
+								<input type="text" placeholder="Search.." name="" @bind="SearchName" @bind:event="oninput" />
+							</div>
+						</div>
+					</div>
 					@*<div class="col">
 					<div class="search-container">
 					<div>
@@ -51,6 +60,7 @@
 					<thead>
 						<tr>
 							<th scope="col"></th>
+							<th scope="col">รายละเอียดเพิ่มเติม</th>
 							<th scope="col">รหัสคำสั่งซื้อ</th>
 							<th scope="col">ชื่อผู้ทำรายการ</th>
 							<th scope="col">แผนก</th>
@@ -62,7 +72,7 @@
 
 						@foreach (var Report in ListReport.Where(s => s.ReportStatus == "Success" &&
 								s.ReportDepartment.ToUpper().Contains(SearchWord.ToUpper()
-
+								@*s.ReportUserName.ToUpper().Contains(SearchName.ToUpper()*@
 								)))
 						{
 							<tr>
@@ -73,6 +83,11 @@
 										</label>
 									</div>
 								</th>
+								<td>
+									<button class="btn btn-link" @onclick="()=>OpenOrderBillPage(Report.ReportID)">
+										ดูเพิ่มเติม
+									</button>
+								</td>
 								<td>@Report.ReportID</td>
 								<td>@Report.ReportUserName</td>
 								<td>@Report.ReportDepartment</td>
@@ -96,6 +111,108 @@
 				</table>
 			</div>
 		</div>
+		-->
+		
+			
+			<div class="card">
+			<div class="card-header" style="text-align:center;">
+				<h1>ค้นหารายงาน</h1>
+				</div>
+				<div class="card-body">
+					<div class="col-lg-1">
+				<div class="form-check mb-3 mt-0">
+					<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" @onclick="OnCheckAll">
+					<label class="form-check-label" for="flexCheckDefault">
+						เลือกทั้งหมด
+					</label>
+				</div>
+			</div>
+				<RadzenDataGrid FilterMode="FilterMode.Simple"
+								AllowFiltering="true" AllowPaging="true" AllowSorting="true" AllowColumnResize="true"
+								PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
+								FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+								LogicalFilterOperator="LogicalFilterOperator.Or" style="--rz-grid-header-background-color:;
+						--rz-grid-hover-background-color: blue;
+						--rz-grid-hover-color: red;
+						--rz-grid-cell-color: grey;">
+
+					<Columns>
+						<RadzenDataGridColumn TItem="Report " Title="" TextAlign="TextAlign.Center">
+							<Template Context="data">
+								<div class="form-check ms-3">
+									<input class="form-check-input" type="checkbox" @bind="data.ReportCheck" @onclick="()=>OnSum(data)">
+								</div>
+							</Template>
+						</RadzenDataGridColumn>
+
+						<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center">
+							<Template Context="data">
+								<RadzenButton Click=@(args => OpenOrderBillPage(data.ReportID))
+											  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" /> @*ปุ่มดูรายละเอียด*@
+							</Template>
+						</RadzenDataGridColumn>
+
+						<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportID" Title="รหัสคำสั่งซื้อ" Filterable="true">
+						</RadzenDataGridColumn>
+
+						<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
+											  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+											  FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
+											  LogicalFilterOperator="LogicalFilterOperator.Or">
+
+							<FilterTemplate>
+								<RadzenDropDown @bind-Value=selectedUserName Style="width:100%;"
+												Data="@(ListUsers)" TextProperty="Name" ValueProperty="Name"
+												AllowFiltering="true" AllowClear="true" Multiple="true" />
+							</FilterTemplate>
+
+						</RadzenDataGridColumn>
+
+						<RadzenDataGridColumn TItem="Report" Title="แผนก" Property="ReportDepartment"
+											  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
+											  FilterValue="@selectedDepartment" FilterOperator="FilterOperator.Contains"
+											  LogicalFilterOperator="LogicalFilterOperator.Or">
+
+							<FilterTemplate>
+								<RadzenDropDown @bind-Value=@selectedDepartment Style="width:100%;"
+												Change=@OnSelectedDepartmentChange Data="@(Departments)" AllowClear="true" Multiple="true" />
+							</FilterTemplate>
+						</RadzenDataGridColumn>
+
+						<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ">
+							@*<Template Context="report">
+							@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", report.ReportPriceSum)
+							</Template>*@
+							<FooterTemplate>
+								@*@{
+								var FinancialStructureValuseEur = this.ListReport.Sum(i => i.ReportPriceSum);
+								}
+								<b>
+								<span class="mathsign">&sum;</span> @String.Format("{0:THB #,##0.00}",FinancialStructureValuseEur)
+								</b>*@
+
+								@*@if (CreateToVar == "")//มันสร้างvarได้แค่ภายในIFเลยต้องIFว่างๆมา//วิธีสำหรับให้เห็นราคารวมของแต่ละร้านค้า
+								{
+								var Report = ListReport.FindAll(e => e.ReportUserID == UserLogin.UserID);
+								@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}",
+								Report.Sum(e=>e.ReportPriceSum)
+								)
+								}*@
+								ราคารวม : <b>@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", ListReport.Sum(o => o.ReportPriceSum))</b> บาท
+							</FooterTemplate>
+						</RadzenDataGridColumn>
+
+						<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ"></RadzenDataGridColumn>
+
+						<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportDate" Title="วันเวลาทำรายการ" FormatString="{0:d}"></RadzenDataGridColumn>
+
+					</Columns>
+
+				</RadzenDataGrid>
+				</div>
+
+			</div>
+			
 		@*//////////////////////////////////////*@
 		<div class="card mt-3 mb-3">
 			<div class="card-header" style="text-align:center;">
@@ -105,7 +222,7 @@
 				<table class="table">
 					<thead>
 						<tr>
-							<th scope="col">รายละเอียดเพิ่มเติม</th>
+
 							<th scope="col">รหัสคำสั่งซื้อ</th>
 							<th scope="col">ชื่อผู้ทำรายการ</th>
 							<th scope="col">แผนก</th>
@@ -114,15 +231,9 @@
 						</tr>
 					</thead>
 					<tbody>
-
 						@foreach (var Report in ListReport.Where(s => s.ReportStatus == "Success" && s.ReportCheck == true && s.ReportDepartment.ToUpper().Contains(SearchWord.ToUpper())))
 						{
 							<tr>
-								<td>
-									<button class="btn btn-link" @onclick="()=>OpenOrderBillPage(Report.ReportID)">
-										ดูเพิ่มเติม
-									</button>
-								</td>
 								<td>@Report.ReportID</td>
 								<td>@Report.ReportUserName</td>
 								<td>@Report.ReportDepartment</td>
@@ -130,7 +241,6 @@
 								<td>@Report.ReportDate</td>
 							</tr>
 						}
-
 					</tbody>
 					<tfoot style="text-align:center">
 						<tr>
@@ -146,90 +256,6 @@
 				</table>
 			</div>
 		</div>
-
-
-
-		@if (ListReport == null)
-		{
-			<p>Loading </p>
-		}
-		else
-		{
-			<RadzenDataGrid FilterMode="FilterMode.Simple"
-						AllowFiltering="true" AllowPaging="true" AllowSorting="true" AllowColumnResize="true"
-						PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
-						FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-						LogicalFilterOperator="LogicalFilterOperator.Or" style="--rz-grid-header-background-color:;
-						--rz-grid-hover-background-color: blue;
-						--rz-grid-hover-color: red;
-						--rz-grid-cell-color: grey;">
-
-				<Columns>
-					<RadzenDataGridColumn TItem="Report " Title="ดูรายละเอียดเพิ่มเติม" TextAlign="TextAlign.Center">
-						<Template Context="data">
-							<RadzenButton Click=@(args => OpenOrderBillPage(data.ReportID))
-									  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="pageview" Class="m-1" /> @*ปุ่มดูรายละเอียด*@
-						</Template>
-					</RadzenDataGridColumn>
-
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportID" Title="รหัสคำสั่งซื้อ" Filterable="true">
-					</RadzenDataGridColumn>
-
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportUserName" Title="ชื่อผู้ทำรายการ"
-									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
-									  FilterValue="@selectedUserName" FilterOperator="FilterOperator.Contains"
-									  LogicalFilterOperator="LogicalFilterOperator.Or">
-
-						<FilterTemplate>
-							<RadzenDropDown @bind-Value=selectedUserName Style="width:100%;"
-										Data="@(ListUsers)" TextProperty="Name" ValueProperty="Name"
-										AllowFiltering="true" AllowClear="true" Multiple="true" />
-						</FilterTemplate>
-
-					</RadzenDataGridColumn>
-
-					<RadzenDataGridColumn TItem="Report" Title="แผนก" Property="ReportDepartment"
-									  Type="typeof(IEnumerable<string>)" TextAlign="TextAlign.Center"
-									  FilterValue="@selectedDepartment" FilterOperator="FilterOperator.Contains"
-									  LogicalFilterOperator="LogicalFilterOperator.Or">
-
-						<FilterTemplate>
-							<RadzenDropDown @bind-Value=@selectedDepartment Style="width:100%;"
-										Change=@OnSelectedDepartmentChange Data="@(Departments)" AllowClear="true" Multiple="true" />
-						</FilterTemplate>
-					</RadzenDataGridColumn>
-
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ">
-						@*<Template Context="report">
-					@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", report.ReportPriceSum)
-					</Template>*@
-						<FooterTemplate>
-							@*@{
-						var FinancialStructureValuseEur = this.ListReport.Sum(i => i.ReportPriceSum);
-						}
-						<b>
-						<span class="mathsign">&sum;</span> @String.Format("{0:THB #,##0.00}",FinancialStructureValuseEur)
-						</b>*@
-
-							@*@if (CreateToVar == "")//มันสร้างvarได้แค่ภายในIFเลยต้องIFว่างๆมา//วิธีสำหรับให้เห็นราคารวมของแต่ละร้านค้า
-						{
-						var Report = ListReport.FindAll(e => e.ReportUserID == UserLogin.UserID);
-						@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}",
-						Report.Sum(e=>e.ReportPriceSum)
-						)
-						}*@
-							ราคารวม : <b>@String.Format(new System.Globalization.CultureInfo("th-TH"), "{0:C}", ListReport.Sum(o => o.ReportPriceSum))</b> บาท
-						</FooterTemplate>
-					</RadzenDataGridColumn>
-
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ"></RadzenDataGridColumn>
-
-					<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportDate" Title="วันเวลาทำรายการ" FormatString="{0:d}"></RadzenDataGridColumn>
-
-				</Columns>
-
-			</RadzenDataGrid>
-		}
 		<div class="position-sticky " style=" bottom:0px; text-align:end; z-index:2;  ">
 			<button class="btn btn-primary shadow mt-1 mb-2 me-3" style="border-radius:50%; font-size:30px; border:none;" data-bs-toggle="modal" data-bs-target="#FromAddMember">
 				<i @onclick="GoToReportViewer" class="fa-solid fa-print" style="font-size:30px;"></i>
@@ -245,10 +271,16 @@
 	private List<User> ListUsers = new List<User>();
 	private User UserLogin = new();
 	private string CreateToVar = "";
+
 	public string SearchWord { get; set; } = string.Empty;
 	List<string> options;
+
 	public DateTime SearchDate { get; set; } = DateTime.Today;
 	List<DateTime> optionsDate;
+
+	public string SearchName { get; set; } = string.Empty;
+	List<string> optionsName;
+
 	private Report CheckBox = new();
 	private bool status = true;
 	protected override async Task OnInitializedAsync()
@@ -264,9 +296,14 @@
 			ListUsers.Add(new User().ToUi(User));
 		}
 		UserLogin = new User().ToUi(loginService.UserToLogin); //แปลงไปใช้ของ UserToUI
+
 		options = ListReport.Select(f => f.ReportDepartment).Distinct().ToList();
+
 		optionsDate = ListReport.Select(o => o.ReportDate).Distinct().ToList();
-		SaveSumPrice();	
+
+		optionsName = ListReport.Select(o => o.ReportUserName).Distinct().ToList();
+
+		SaveSumPrice();
 	}
 
 	IEnumerable<string> selectedDepartment;
