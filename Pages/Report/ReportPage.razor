@@ -129,7 +129,7 @@
 				</div>
 				<RadzenDataGrid FilterMode="FilterMode.Simple"
 								AllowFiltering="true" AllowPaging="true" AllowSorting="true" AllowColumnResize="true"
-								PageSize="50" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
+								PageSize="10" Data="@(ListReport.Where(o => o.ReportStatus == "Success"))" TItem="CW_ordermedicine.Data.Models.Report" ColumnWidth="150px"
 								FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
 								LogicalFilterOperator="LogicalFilterOperator.Or" style="--rz-grid-header-background-color:;
 						--rz-grid-hover-background-color: blue;
@@ -202,8 +202,6 @@
 							</FooterTemplate>
 						</RadzenDataGridColumn>
 
-						<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportPriceSum" Title="ราคาสุทธิ"></RadzenDataGridColumn>
-
 						<RadzenDataGridColumn TItem="CW_ordermedicine.Data.Models.Report" Property="ReportDate" Title="วันเวลาทำรายการ" FormatString="{0:d}"></RadzenDataGridColumn>
 
 					</Columns>
@@ -274,7 +272,7 @@
 	<div class="PrintShowout bg-black bg-opacity-50 d-flex justify-content-center " style="position:absolute;z-index:35;">
 		<div class="row mb-2 d-inline-flex justify-content-end position-relative" style="bottom:-20%;left:80%;">
 		</div>
-		<div class="bg-white PrintShowin" style="position:relative; top:100px;">
+		<div class="bg-white PrintShowin" style="position:relative; top:55%;">
 			<div class="card">
 				<div class="card-header">
 					<div class="row">
