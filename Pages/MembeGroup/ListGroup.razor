@@ -6,7 +6,7 @@
 @inject GroupMemberService groupmemberService
 @inject LoginService loginService
 @inject NotificationService notificationservice
-
+@inject NavigationManager NavigationManager
 
 <!-- รูปแบบเก่าที่ไม่ใช้ Component -->
 <div class="">
@@ -19,57 +19,7 @@
 	}
 
 </div>
-@*<div class="">
-	<table class="table table-hover">
-		<thead>
-			<tr>
-				<th scope="col">#</th>
-				<th scope="col">ภาพ</th>
 
-				<th scope="col">ชื่อ - นามสกุล</th>
-				<th scope="col">แผนก</th>
-				<th scope="col"></th>
-			</tr>
-		</thead>
-		<tbody>
-
-			@for (int i = 0; i < ListUsers.Count; i++)
-			{
-
-				@if (ListUsers[i].GroupID == GetCurrentGroupIDPage)
-				{
-					var tempint = i;
-
-					<tr>
-						<td>@(i + 1)</td>
-						<th scope="row">
-							<img class="rounded-3" style="width:30px; height:30px;" src="img/@ListUsers[i].UserImgName">
-						</th>
-						<td>@ListUsers[i].Username</td>
-						<td>@ListUsers[i].Department</td>
-
-						<td>
-							@if (UserLogin.Level == "admin")
-							{
-								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="()=>SentValue(ListUsers[tempint])" data-bs-toggle="modal" data-bs-target="#ModalDelete">
-									ลบสมาชิก
-								</div>
-
-							}
-							else
-							{
-								<div class="text-danger me-1" style="border-radius:10px;cursor:pointer;" @onclick="ShowNotificationAlert">
-									ลบสมาชิก
-								</div>
-							}
-						</td>
-					</tr>
-				}
-			}
-		</tbody>
-
-	</table>
-</div>*@
 <RadzenDataGrid FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
 				PageSize="10" Data="@ListUsers.Where(e=>e.GroupID == GetCurrentGroupIDPage)" TItem="User" ColumnWidth="150px">
 	<Columns>
@@ -207,6 +157,7 @@
 		userService.EditUser(a); //บันทึกข้อมูล
 		ListUsers.Remove(eleuser);
 		ShowNotificationDeleteMember();
+		RefreshData();
 	}
 	private void CountPeople()
 	{
@@ -256,6 +207,11 @@
 	private void SentValue(User? ID)
 	{
 		ValueUser = ID;
+	}
+	private async void RefreshData()
+	{
+		NavigationManager.NavigateTo($"/RP_ProfileProduct");
+		NavigationManager.NavigateTo($"/list-group/{GetCurrentGroupIDPage}");
 	}
 }
 
