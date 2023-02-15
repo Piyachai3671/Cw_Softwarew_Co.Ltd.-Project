@@ -1,0 +1,82 @@
+﻿@page "/orderselect"
+@using CW_ordermedicine.Data.Models
+@using CW_ordermedicine.Data.Services
+@inject ReportService reportService
+@inject UserService userService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime js
+
+<div class="container-fluid" style="text-align:center;">
+	<div class="card mt-3 mb-3">
+		<div class="card-header">
+			<h1>รายงานที่เลือก</h1>
+		</div>
+		<div class="card-body" >
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">รหัสคำสั่งซื้อ</th>
+						<th scope="col">ชื่อผู้ทำรายการ</th>
+						<th scope="col">แผนก</th>
+						<th scope="col">ราคาสุทธิ</th>
+						<th scope="col">วันเวลาทำรายการ</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var Report in ListReport.FindAll(s => s.ReportStatus == "Success" && s.ReportCheck == true ))
+					{
+						<tr>
+							<td>@Report.ReportID</td>
+							<td>@Report.ReportUserName</td>
+							<td>@Report.ReportDepartment</td>
+							<td>@Report.ReportPriceSum</td>
+							<td>@Report.ReportDate</td>
+						</tr>
+					}
+				</tbody>
+				<tfoot style="text-align:center">
+					<tr>
+						<td>จำนวนคำสั่งซื้อ : @ListReport.FindAll(e=>e.ReportCheck == true).Count() รายการ</td>
+						<td></td>
+						<td></td>
+						<td>ราคาทั้งหมด : @SumPriceCheck บาท</td>
+						<td></td>
+						<td>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+@code {
+	private List<Report> ListReport = new List<Report>();
+	private List<User> ListUsers = new List<User>();
+	double SumPriceCheck = 0.0;
+	protected override async Task OnInitializedAsync()
+	{
+		var Reports = await reportService.GetReportsAsync();
+		foreach (var Report in Reports)
+		{
+			ListReport.Add(new Report().ToUi(Report));
+		}
+		var Users = await userService.GetUserAsync();
+		foreach (var User in Users)
+		{
+			ListUsers.Add(new User().ToUi(User));
+		}
+		foreach (var Report in ListReport.FindAll(e => e.ReportStatus == "Success"))
+		{
+			if (Report.ReportCheck == true)
+			{
+				SumPriceCheck = SumPriceCheck + Report.ReportPriceSum ?? 0.0;
+			}
+		}
+
+	}
+	
+	
+}
+
