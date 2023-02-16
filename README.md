@@ -23,3 +23,5 @@
 -เลือกเฉพาะรายงานที่ต้องการ
 
 -สั่งพิมพ์รายงานที่เลือก
+
+![Screenshot 2023-02-16 173023](https://user-images.githubusercontent.com/105155094/219340466-c3e2d125-eec2-46f6-aa6c-84b2ad3e5a45.png)
