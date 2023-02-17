@@ -8,6 +8,7 @@
 - C# สำหรับควบคุมการทำงาน
 - SQL Server 2014 สำหรับบันทึกข้อมูล
 - SoucrceTree Github จุดเซฟ
+
 เป็นระบบเบิกยาที่สามารถทำงานดังนี้
 
 ![Screenshot 2023-02-16 173508](https://user-images.githubusercontent.com/105155094/219342498-a4fb87c1-1adb-4daf-9c5a-19d922a4f32b.png)
