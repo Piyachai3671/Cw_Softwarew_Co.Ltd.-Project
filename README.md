@@ -1,6 +1,12 @@
 ![Screenshot 2023-02-16 173023](https://user-images.githubusercontent.com/105155094/219340466-c3e2d125-eec2-46f6-aa6c-84b2ad3e5a45.png)
 
-ระบบเบิกยาภายในองค์กร Cw Software เป็นระบบที่เริ่มพัฒนาตั้งแต่วันที่ 14 พฤษจิกายน 2565 จนถึงวันที่ 17 กุมภาพันธ์ 2566 เป็นระบบเบิกยาที่สามารถทำงานดังนี้
+ระบบเบิกยาภายในองค์กร Cw Software เป็นระบบที่เริ่มพัฒนาตั้งแต่วันที่ 14 พฤษจิกายน 2565 จนถึงวันที่ 17 กุมภาพันธ์ 2566 
+เครื่องมือที่ใช้
+- HTML CSS Boostrap5 RadzenComponent Fontawesome สำหรับการออกแบบหน้า UX/UI
+- C# สำหรับควบคุมการทำงาน
+- SQL Serverr 2014 สำหรับบันทึกข้อมูล
+- SoucrceTree Github จุดเซฟ
+เป็นระบบเบิกยาที่สามารถทำงานดังนี้
 
 ![Screenshot 2023-02-16 173508](https://user-images.githubusercontent.com/105155094/219342498-a4fb87c1-1adb-4daf-9c5a-19d922a4f32b.png)
 
